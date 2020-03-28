@@ -31,7 +31,6 @@ import feast.core.job.direct.DirectJobRegistry;
 import feast.core.job.direct.DirectRunnerJobManager;
 import feast.core.job.spark.SparkJobRegistry;
 import feast.core.job.spark.SparkRunnerJobManager;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
@@ -54,7 +53,9 @@ public class JobConfig {
   @Bean
   @Autowired
   public JobManager getJobManager(
-      FeastProperties feastProperties, DirectJobRegistry directJobRegistry, SparkJobRegistry sparkJobRegistry) {
+      FeastProperties feastProperties,
+      DirectJobRegistry directJobRegistry,
+      SparkJobRegistry sparkJobRegistry) {
 
     JobProperties jobProperties = feastProperties.getJobs();
     Runner runner = Runner.fromString(jobProperties.getRunner());
