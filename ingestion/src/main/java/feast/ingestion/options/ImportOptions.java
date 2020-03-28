@@ -26,7 +26,8 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.Validation.Required;
 
 /** Options passed to Beam to influence the job's execution environment */
-public interface ImportOptions extends PipelineOptions, DataflowPipelineOptions, SparkPipelineOptions, DirectOptions {
+public interface ImportOptions
+    extends PipelineOptions, DataflowPipelineOptions, SparkPipelineOptions, DirectOptions {
 
   @Required
   @Description(
