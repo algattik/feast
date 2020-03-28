@@ -19,13 +19,14 @@ package feast.ingestion.options;
 import java.util.List;
 import org.apache.beam.runners.dataflow.options.DataflowPipelineOptions;
 import org.apache.beam.runners.direct.DirectOptions;
+import org.apache.beam.runners.spark.SparkPipelineOptions;
 import org.apache.beam.sdk.options.Default;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.Validation.Required;
 
 /** Options passed to Beam to influence the job's execution environment */
-public interface ImportOptions extends PipelineOptions, DataflowPipelineOptions, DirectOptions {
+public interface ImportOptions extends PipelineOptions, DataflowPipelineOptions, SparkPipelineOptions, DirectOptions {
 
   @Required
   @Description(

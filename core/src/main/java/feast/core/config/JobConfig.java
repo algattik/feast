@@ -29,6 +29,9 @@ import feast.core.job.Runner;
 import feast.core.job.dataflow.DataflowJobManager;
 import feast.core.job.direct.DirectJobRegistry;
 import feast.core.job.direct.DirectRunnerJobManager;
+import feast.core.job.spark.SparkJobRegistry;
+import feast.core.job.spark.SparkRunnerJobManager;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
@@ -51,7 +54,7 @@ public class JobConfig {
   @Bean
   @Autowired
   public JobManager getJobManager(
-      FeastProperties feastProperties, DirectJobRegistry directJobRegistry) {
+      FeastProperties feastProperties, DirectJobRegistry directJobRegistry, SparkJobRegistry sparkJobRegistry) {
 
     JobProperties jobProperties = feastProperties.getJobs();
     Runner runner = Runner.fromString(jobProperties.getRunner());
@@ -89,6 +92,9 @@ public class JobConfig {
       case DIRECT:
         return new DirectRunnerJobManager(
             jobProperties.getOptions(), directJobRegistry, jobProperties.getMetrics());
+      case SPARK:
+        return new SparkRunnerJobManager(
+            jobProperties.getOptions(), sparkJobRegistry, jobProperties.getMetrics());
       default:
         throw new IllegalArgumentException("Unsupported runner: " + jobProperties.getRunner());
     }
@@ -98,6 +104,12 @@ public class JobConfig {
   @Bean
   public DirectJobRegistry directJobRegistry() {
     return new DirectJobRegistry();
+  }
+
+  /** Get a spark job registry */
+  @Bean
+  public SparkJobRegistry sparkJobRegistry() {
+    return new SparkJobRegistry();
   }
 
   /** Extracts job update options from feast core options. */
