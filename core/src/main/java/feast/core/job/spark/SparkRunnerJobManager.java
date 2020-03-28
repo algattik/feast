@@ -83,7 +83,7 @@ public class SparkRunnerJobManager implements JobManager {
 
       // Spark specific options
       pipelineOptions.setFilesToStage(Collections.EMPTY_LIST);
-      pipelineOptions.setSparkMaster("yarn");
+      pipelineOptions.setSparkMaster("yarn-client");
 
       PipelineResult pipelineResult = runPipeline(pipelineOptions);
       SparkJob sparkJob = new SparkJob(job.getId(), pipelineResult);
