@@ -1,0 +1,30 @@
+
+./generate-certs.sh
+
+
+######################## SHELL 1: RUN FEAST CORE ################################
+
+ssh acctestusrvm@$JUMPHOST
+ssh-keygen
+ssh-copy-id acctestusrvm@$EDGENODE # AccTestvdSC4daf986!
+ssh acctestusrvm@$EDGENODE
+hdfs dfs -copyToLocal /feast_jars/feast-core-0.4.2-SNAPSHOT.jar
+java -jar feast-core-0.4.2-SNAPSHOT.jar --spring.datasource.url=jdbc:postgresql://$HELPERS/postgres --feast.stream.options.bootstrapServers=$KAFKA:9092
+
+######################## SHELL 2: RUN FEAST SERVING ################################
+
+hdfs dfs -copyToLocal /feast_jars/feast-serving-0.4.2-SNAPSHOT.jar
+mkdir -p serving
+cat > serving/sample_redis_config.yml <<EOF
+name: serving
+type: REDIS
+redis_config:
+  host: $HELPERS
+  port: 6379
+subscriptions:
+- name: "*"
+  project: "*"
+  version: "*"
+EOF
+
+java -jar feast-serving-0.4.2-SNAPSHOT.jar 
