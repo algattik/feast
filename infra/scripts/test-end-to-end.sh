@@ -99,6 +99,7 @@ grpc:
 
 feast:
   jobs:
+<<<<<<< Updated upstream
     polling_interval_milliseconds: 30000
     job_update_timeout_seconds: 240
 
@@ -109,6 +110,13 @@ feast:
         type: DirectRunner
         options: {}
 
+=======
+    runner: SparkRunner
+    options: {}
+    updates:
+      pollingIntervalMillis: 30000
+      timeoutSeconds: 240
+>>>>>>> Stashed changes
     metrics:
       enabled: false
 
@@ -136,11 +144,17 @@ spring:
 
 EOF
 
-nohup java -jar core/target/feast-core-*${JAR_VERSION_SUFFIX}.jar \
-  --spring.config.location=file:///tmp/core.application.yml \
+#nohup java -jar core/target/feast-core-*${JAR_VERSION_SUFFIX}.jar \
+nohup bash -c "rm -rf c ; mkdir -p c; unzip -d c -q -o core/target/feast-core-*${JAR_VERSION_SUFFIX}.jar; CLASSPATH=\"c/BOOT-INF/classes:\$(ls c/BOOT-INF/lib/*.jar | tr '\n' ':'):spark/target/spark-dependency-gatherer-0.0.1.jar\" java feast.core.CoreApplication \
+  --spring.config.location=file:///tmp/core.application.yml "\
   &> /var/log/feast-core.log &
-sleep 35
+
+
+for i in {1..10}; do
+sleep 10
 tail -n10 /var/log/feast-core.log
+nc -w2 localhost 6565 < /dev/null && break
+done
 nc -w2 localhost 6565 < /dev/null
 
 echo "
@@ -183,8 +197,11 @@ EOF
 nohup java -jar serving/target/feast-serving-*${JAR_VERSION_SUFFIX}.jar \
   --spring.config.location=file:///tmp/serving.online.application.yml \
   &> /var/log/feast-serving-online.log &
-sleep 15
+for i in {1..10}; do
+sleep 5
 tail -n100 /var/log/feast-serving-online.log
+nc -w2 localhost 6566 < /dev/null && break
+done
 nc -w2 localhost 6566 < /dev/null
 
 echo "

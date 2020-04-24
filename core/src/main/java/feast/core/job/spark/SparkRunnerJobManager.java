@@ -82,11 +82,23 @@ public class SparkRunnerJobManager implements JobManager {
           getPipelineOptions(featureSetProtos, job.getStore().toProto());
 
       // Spark specific options
+<<<<<<< Updated upstream
       pipelineOptions.setFilesToStage(Collections.EMPTY_LIST);
       pipelineOptions.setSparkMaster("yarn-client");
 
       PipelineResult pipelineResult = runPipeline(pipelineOptions);
       SparkJob sparkJob = new SparkJob(job.getId(), pipelineResult);
+=======
+      pipelineOptions.setFilesToStage(Collections.<String>emptyList());
+      pipelineOptions.setFilesToStage(java.util.Arrays.asList(System.getenv("FILES_TO_STAGE").split(":")));
+      pipelineOptions.setSparkMaster("yarn-cluster");
+
+      log.info("XXX Run pipeline");
+      PipelineResult pipelineResult = runPipeline(pipelineOptions);
+      log.info("XXX Ran pipeline {}", pipelineResult);
+      SparkJob sparkJob = new SparkJob(job.getId(), pipelineResult);
+      log.info("XXX Spark job {}", sparkJob);
+>>>>>>> Stashed changes
       jobs.add(sparkJob);
       job.setExtId(job.getId());
       job.setStatus(JobStatus.RUNNING);
@@ -105,11 +117,20 @@ public class SparkRunnerJobManager implements JobManager {
     OptionCompressor<List<FeatureSetProto.FeatureSet>> featureSetJsonCompressor =
         new BZip2Compressor<>(new FeatureSetJsonByteConverter());
 
+<<<<<<< Updated upstream
+=======
+    pipelineOptions.setStreaming(true);
+
+>>>>>>> Stashed changes
     pipelineOptions.setFeatureSetJson(featureSetJsonCompressor.compress(featureSets));
     pipelineOptions.setStoreJson(Collections.singletonList(JsonFormat.printer().print(sink)));
     pipelineOptions.setRunner(SparkRunner.class);
     pipelineOptions.setProject(""); // set to default value to satisfy validation
+<<<<<<< Updated upstream
     if (metrics.isEnabled()) {
+=======
+    if (false && metrics.isEnabled()) {
+>>>>>>> Stashed changes
       pipelineOptions.setMetricsExporterType(metrics.getType());
       if (metrics.getType().equals("statsd")) {
         pipelineOptions.setStatsdHost(metrics.getHost());
@@ -159,12 +180,39 @@ public class SparkRunnerJobManager implements JobManager {
   }
 
   public PipelineResult runPipeline(ImportOptions pipelineOptions) throws IOException {
+<<<<<<< Updated upstream
+=======
+    log.info("XXX2 Run pipeline {}", pipelineOptions);
+>>>>>>> Stashed changes
     return ImportJob.runPipeline(pipelineOptions);
   }
 
   /**
+<<<<<<< Updated upstream
    * Gets the state of the direct runner job. Direct runner jobs only have 2 states: RUNNING and
    * ABORTED.
+=======
+   * Restart a direct runner job.
+   *
+   * @param job job to restart
+   * @return the restarted job
+   */
+  @Override
+  public Job restartJob(Job job) {
+    JobStatus status = job.getStatus();
+    if (JobStatus.getTerminalState().contains(status)) {
+      // job yet not running: just start job
+      return this.startJob(job);
+    } else {
+      // job is running - updating the job without changing the job has
+      // the effect of restarting the job.
+      return this.updateJob(job);
+    }
+  }
+
+  /**
+   * Gets the state of the direct runner job.
+>>>>>>> Stashed changes
    *
    * @param job Job of the desired job.
    * @return JobStatus of the job.

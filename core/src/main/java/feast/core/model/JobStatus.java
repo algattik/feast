@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.HashMap;
 
 public enum JobStatus {
   /** Job status is not known. */
@@ -80,17 +81,17 @@ public enum JobStatus {
     return TRANSITIONAL_STATES;
   }
 
-  private static final Map<JobStatus, IngestionJobStatus> INGESTION_JOB_STATUS_MAP =
-      Map.of(
-          JobStatus.UNKNOWN, IngestionJobStatus.UNKNOWN,
-          JobStatus.PENDING, IngestionJobStatus.PENDING,
-          JobStatus.RUNNING, IngestionJobStatus.RUNNING,
-          JobStatus.COMPLETED, IngestionJobStatus.COMPLETED,
-          JobStatus.ABORTING, IngestionJobStatus.ABORTING,
-          JobStatus.ABORTED, IngestionJobStatus.ABORTED,
-          JobStatus.ERROR, IngestionJobStatus.ERROR,
-          JobStatus.SUSPENDING, IngestionJobStatus.SUSPENDING,
-          JobStatus.SUSPENDED, IngestionJobStatus.SUSPENDED);
+  private static final Map<JobStatus, IngestionJobStatus> INGESTION_JOB_STATUS_MAP = new HashMap<JobStatus, IngestionJobStatus>() {{
+         put(JobStatus.UNKNOWN, IngestionJobStatus.UNKNOWN);
+         put(JobStatus.PENDING, IngestionJobStatus.PENDING);
+         put(JobStatus.RUNNING, IngestionJobStatus.RUNNING);
+         put(JobStatus.COMPLETED, IngestionJobStatus.COMPLETED);
+         put(JobStatus.ABORTING, IngestionJobStatus.ABORTING);
+         put(JobStatus.ABORTED, IngestionJobStatus.ABORTED);
+         put(JobStatus.ERROR, IngestionJobStatus.ERROR);
+         put(JobStatus.SUSPENDING, IngestionJobStatus.SUSPENDING);
+         put(JobStatus.SUSPENDED, IngestionJobStatus.SUSPENDED);
+}};
 
   /**
    * Convert a Job Status to Ingestion Job Status proto

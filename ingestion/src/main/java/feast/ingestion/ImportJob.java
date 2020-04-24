@@ -61,7 +61,6 @@ public class ImportJob {
 
   /**
    * @param args arguments to be passed to Beam pipeline
-   * @throws InvalidProtocolBufferException if options passed to the pipeline are invalid
    */
   public static void main(String[] args) throws IOException {
     ImportOptions options =
@@ -80,8 +79,11 @@ public class ImportJob {
      * 5. Write metrics to a metrics sink
      */
 
+    log.info("XXX3 Run pipeline {}", options);
     PipelineOptionsValidator.validate(ImportOptions.class, options);
+    log.info("XXX4 Run pipeline {}", options);
     Pipeline pipeline = Pipeline.create(options);
+    log.info("XXX5 Run pipeline {}", pipeline);
 
     log.info("Starting import job with settings: \n{}", options.toString());
 
@@ -159,6 +161,7 @@ public class ImportJob {
       }
 
       // Step 5. Write metrics to a metrics sink.
+/*
       writeFeatureRows
           .getSuccessfulInserts()
           .apply("WriteSuccessMetrics", WriteSuccessMetricsTransform.create(store.getName()));
@@ -166,6 +169,7 @@ public class ImportJob {
       writeFeatureRows
           .getFailedInserts()
           .apply("WriteFailureMetrics", WriteFailureMetricsTransform.create(store.getName()));
+*/
     }
 
     return pipeline.run();

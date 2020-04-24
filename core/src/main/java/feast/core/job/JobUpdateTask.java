@@ -117,6 +117,7 @@ public class JobUpdateTask implements Callable<Job> {
     try {
       job = submittedJob.get(getJobUpdateTimeoutSeconds(), TimeUnit.SECONDS);
     } catch (InterruptedException | ExecutionException | TimeoutException e) {
+      log.warn("Unable to start job for source and sink", e);
       log.warn("Unable to start job for source {} and sink {}: {}", source, store, e.getMessage());
       executorService.shutdownNow();
     }
@@ -173,7 +174,7 @@ public class JobUpdateTask implements Callable<Job> {
 
       return job;
     } catch (Exception e) {
-      log.error(e.getMessage());
+      log.error("Job failed to be submitted to runner", e);
       AuditLogger.log(
           Resource.JOB,
           jobId,

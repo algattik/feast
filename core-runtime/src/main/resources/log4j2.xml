@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2018 The Feast Authors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<Configuration status="WARN">
+    <Properties>
+        <Property name="LOG_PATTERN">
+            %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${hostName} --- [%15.15t] %-40.40c{1.} : %m%n%ex
+        </Property>
+        <Property name="APPENDER_TYPE">${env:LOG_TYPE:-Console}</Property>
+        <Property name="LOG_LEVEL">${env:LOG_LEVEL:-info}</Property>
+    </Properties>
+    <CustomLevels>
+        <CustomLevel name="AUDIT" intLevel="350"/>
+    </CustomLevels>
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+        <Console name="JSONAppender" target="SYSTEM_OUT" follow="true">
+            <JsonLayout  compact="true" eventEol="true" objectMessageAsJsonObject="true" />
+        </Console>
+    </Appenders>
+    <Loggers>
+      <Logger name="feast.core" level="debug" additivity="false">
+        <AppenderRef ref="${APPENDER_TYPE}Appender"/>
+      </Logger>
+      <Root level="${LOG_LEVEL}">
+        <AppenderRef ref="${APPENDER_TYPE}Appender"/>
+      </Root>
+    </Loggers>
+</Configuration>

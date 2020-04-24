@@ -157,7 +157,7 @@ public class JobService {
       throws InvalidProtocolBufferException {
     // check job exists
     Optional<Job> getJob = this.jobRepository.findById(request.getId());
-    if (getJob.isEmpty()) {
+    if (!getJob.isPresent()) {
       throw new NoSuchElementException(
           "Attempted to stop nonexistent job with id: " + getJob.get().getId());
     }
@@ -200,7 +200,7 @@ public class JobService {
       throws InvalidProtocolBufferException {
     // check job exists
     Optional<Job> getJob = this.jobRepository.findById(request.getId());
-    if (getJob.isEmpty()) {
+    if (!getJob.isPresent()) {
       throw new NoSuchElementException(
           "Attempted to stop nonexistent job with id: " + getJob.get().getId());
     }

@@ -31,7 +31,7 @@
     <parent>
       <groupId>dev.feast</groupId>
       <artifactId>feast-parent</artifactId>
-      <version>${revision}</version>
+      <version>0.5-SNAPSHOT</version>
       <relativePath>../..</relativePath>
     </parent>
 
@@ -42,7 +42,9 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
             <!-- To ensure Ingestion remains compatible for Java 8-only Beam runners -->
+<!--
             <release>8</release>
+-->
           </configuration>
         </plugin>
 

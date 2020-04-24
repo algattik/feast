@@ -23,7 +23,7 @@
     <parent>
         <groupId>dev.feast</groupId>
         <artifactId>feast-parent</artifactId>
-        <version>${revision}</version>
+        <version>0.5-SNAPSHOT</version>
     </parent>
 
     <name>Feast Core</name>
@@ -32,6 +32,7 @@
 
     <build>
         <plugins>
+<<<<<<< Updated upstream
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -47,6 +48,53 @@
                     </execution>
                 </executions>
             </plugin>
+=======
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+		    <!--
+		    <shadedArtifactAttached>true</shadedArtifactAttached>
+-->
+              <transformers>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+    <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+        <resource>META-INF/spring.factories</resource>
+    </transformer>
+
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>org.springframework.vendor.boot.loader.JarLauncher</mainClass>
+                </transformer>
+              </transformers>
+              <!-- Relocate packages so if Feast ingestion is imported as a library, the client
+              can use different version of the same library e.g. because of backward compatiblity issues -->
+              <relocations>
+                <relocation>
+                  <pattern>com.fasterxml.jackson</pattern>
+                  <shadedPattern>com.fasterxml.jackson.vendor</shadedPattern>
+                </relocation>
+		<!--
+                <relocation>
+                  <pattern>org.springframework</pattern>
+                  <shadedPattern>org.springframework.vendor</shadedPattern>
+                </relocation>
+-->
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+>>>>>>> Stashed changes
         </plugins>
     </build>
 

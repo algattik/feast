@@ -32,7 +32,6 @@ public class BZip2Compressor<T> implements OptionCompressor<T> {
    *
    * @param option Pipeline option value
    * @return BZip2 compressed option value
-   * @throws IOException
    */
   @Override
   public byte[] compress(T option) throws IOException {

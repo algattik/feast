@@ -54,8 +54,8 @@ public class RedisCustomIO {
   private static final int DEFAULT_BATCH_SIZE = 1000;
   private static final int DEFAULT_TIMEOUT = 2000;
 
-  private static TupleTag<FeatureRow> successfulInsertsTag = new TupleTag<>("successfulInserts") {};
-  private static TupleTag<FailedElement> failedInsertsTupleTag = new TupleTag<>("failedInserts") {};
+  private static TupleTag<FeatureRow> successfulInsertsTag = new TupleTag<FeatureRow>("successfulInserts") {};
+  private static TupleTag<FailedElement> failedInsertsTupleTag = new TupleTag<FailedElement>("failedInserts") {};
 
   private static final Logger log = LoggerFactory.getLogger(RedisCustomIO.class);
 
@@ -102,6 +102,7 @@ public class RedisCustomIO {
     }
 
     public static class WriteDoFn extends DoFn<FeatureRow, FeatureRow> {
+static final long serialVersionUID = 42L;
 
       private final List<FeatureRow> featureRows = new ArrayList<>();
       private Map<String, FeatureSetSpec> featureSetSpecs;

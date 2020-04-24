@@ -30,6 +30,9 @@ import java.util.Map;
  * <p>The use for this class is mainly for validating the Fields in FeatureRow.
  */
 public class FeatureSet implements Serializable {
+
+static final long serialVersionUID = 42L;
+
   private final String reference;
 
   private final Map<String, Field> fields;

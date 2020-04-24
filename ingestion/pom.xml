@@ -23,7 +23,7 @@
   <parent>
     <groupId>dev.feast</groupId>
     <artifactId>feast-parent</artifactId>
-    <version>${revision}</version>
+    <version>0.5-SNAPSHOT</version>
   </parent>
 
   <name>Feast Ingestion</name>
@@ -36,7 +36,9 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <!-- To ensure Ingestion remains compatible for Java 8-only Beam runners -->
+<!--
           <release>8</release>
+-->
         </configuration>
       </plugin>
 
@@ -46,6 +48,73 @@
         <version>3.2.1</version>
         <executions>
           <execution>
+            <id>attach-with-protobuf</id>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+<shadedArtifactAttached>true</shadedArtifactAttached>
+<shadedClassifierName>attached</shadedClassifierName> 
+              <transformers>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>feast.ingestion.ImportJobOld</mainClass>
+                </transformer>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>reference.conf</resource>
+                </transformer>
+		<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+        <resource>META-INF/spring.handlers</resource>
+    </transformer>
+    <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+        <resource>META-INF/spring.schemas</resource>
+    </transformer>
+    <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+        <resource>META-INF/spring.factories</resource>
+    </transformer>
+              </transformers>
+              <!-- Relocate packages so if Feast ingestion is imported as a library, the client
+              can use different version of the same library e.g. because of backward compatiblity issues -->
+              <relocations>
+                <relocation>
+                  <pattern>org.springframework</pattern>
+                  <shadedPattern>org.springframework.vendor</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>io.grpc</pattern>
+                  <shadedPattern>io.grpc.vendor</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>io.opencensus</pattern>
+                  <shadedPattern>io.opencensus.vendor</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>feast.core</pattern>
+                  <shadedPattern>feast.core.vendor</shadedPattern>
+                </relocation>
+<!--
+-->
+                <relocation>
+                  <pattern>com.google.cloud.bigquery</pattern>
+                  <shadedPattern>com.google.cloud.bigquery.vendor</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.fasterxml.jackson</pattern>
+                  <shadedPattern>shaded.com.fasterxml.jackson</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.google.protobuf</pattern>
+                  <shadedPattern>com.google.protobuf.vendor</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+          <execution>
+            <id>shade-for-core</id>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
@@ -62,6 +131,15 @@
                   implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                   <resource>reference.conf</resource>
                 </transformer>
+		<transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+        <resource>META-INF/spring.handlers</resource>
+    </transformer>
+    <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+        <resource>META-INF/spring.schemas</resource>
+    </transformer>
+    <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+        <resource>META-INF/spring.factories</resource>
+    </transformer>
               </transformers>
               <!-- Relocate packages so if Feast ingestion is imported as a library, the client
               can use different version of the same library e.g. because of backward compatiblity issues -->
@@ -85,6 +163,10 @@
                 <relocation>
                   <pattern>com.google.cloud.bigquery</pattern>
                   <shadedPattern>com.google.cloud.bigquery.vendor</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.fasterxml.jackson</pattern>
+                  <shadedPattern>shaded.com.fasterxml.jackson</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
@@ -180,6 +262,15 @@
       <groupId>org.apache.beam</groupId>
       <artifactId>beam-runners-spark</artifactId>
       <version>${org.apache.beam.version}</version>
+<<<<<<< Updated upstream
+=======
+      <exclusions>
+      <exclusion>
+	      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>*</artifactId>
+      </exclusion>
+      </exclusions>
+>>>>>>> Stashed changes
     </dependency>
 
     <dependency>
