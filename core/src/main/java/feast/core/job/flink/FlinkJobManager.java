@@ -48,6 +48,7 @@ import org.apache.beam.runners.flink.FlinkRunnerResult;
 import org.apache.beam.sdk.PipelineResult.State;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.flink.client.cli.CliFrontend;
+import org.apache.flink.client.cli.CustomCommandLine;
 import org.apache.flink.configuration.GlobalConfiguration;
 import org.springframework.web.client.RestTemplate;
 
@@ -71,8 +72,7 @@ public class FlinkJobManager implements JobManager {
 
     org.apache.flink.configuration.Configuration configuration =
         GlobalConfiguration.loadConfiguration(config.getConfigDir());
-    var customCommandLines =
-        CliFrontend.loadCustomCommandLines(configuration, config.getConfigDir());
+    List<CustomCommandLine<?>> customCommandLines = CliFrontend.loadCustomCommandLines(configuration, config.getConfigDir());
     try {
       this.flinkCli = new CliFrontend(configuration, customCommandLines);
     } catch (Exception e) {
@@ -81,7 +81,7 @@ public class FlinkJobManager implements JobManager {
     }
     this.flinkRestApis = new FlinkRestApi(new RestTemplate(), config.getMasterUrl());
 
-    this.defaultOptions = runnerConfigOptions;
+    this.defaultOptions = Map.of("flinkMaster", runnerConfigOptions.get("masterUrl"));
     this.metrics = metricsProperties;
   }
 
@@ -273,6 +273,7 @@ public class FlinkJobManager implements JobManager {
     // pipelineOptions.setAllowNonRestoredState(Boolean allowNonRestoredState);
     // pipelineOptions.setAutoBalanceWriteFilesShardingEnabled(Boolean
     // autoBalanceWriteFilesShardingEnabled);
+    pipelineOptions.setProject(""); // set to default value to satisfy validation
 
     if (metrics.isEnabled()) {
       pipelineOptions.setMetricsExporterType(metrics.getType());

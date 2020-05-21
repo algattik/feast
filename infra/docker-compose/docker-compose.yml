@@ -7,7 +7,7 @@ services:
       dockerfile: infra/docker/core/Dockerfile
     image: ${FEAST_CORE_IMAGE}:${FEAST_VERSION}
     volumes:
-      - ./core/${FEAST_CORE_CONFIG}:/etc/feast/application.yml
+      - ./core/${FEAST_CORE_CONFIG}:/etc/feast
       - ./gcp-service-accounts/${FEAST_CORE_GCP_SERVICE_ACCOUNT_KEY}:/etc/gcloud/service-accounts/key.json
     environment:
       DB_HOST: db

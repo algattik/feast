@@ -16,7 +16,7 @@ feast:
         type: FlinkRunner
         options:
           masterUrl: http://localhost:9999
-          configDir: /etc
+          configDir: /etc/feast
   stream:
     options:
       bootstrapServers: kafka:9092
