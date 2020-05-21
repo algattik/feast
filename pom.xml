@@ -50,6 +50,7 @@
         <protobufVersion>3.10.0</protobufVersion>
         <springBootVersion>2.2.7.RELEASE</springBootVersion>
         <org.apache.beam.version>2.16.0</org.apache.beam.version>
+        <org.apache.flink.version>1.8</org.apache.flink.version>
         <com.google.cloud.version>1.91.0</com.google.cloud.version>
         <io.prometheus.version>0.8.0</io.prometheus.version>
         <byte-buddy.version>1.9.10</byte-buddy.version>
@@ -411,7 +412,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>11</release>
+                    <release>8</release>
                 </configuration>
             </plugin>
             <plugin>

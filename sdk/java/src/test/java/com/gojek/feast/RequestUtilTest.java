@@ -82,7 +82,7 @@ class RequestUtilTest {
   }
 
   private static Stream<Arguments> provideInvalidFeatureRefs() {
-    return Stream.of(Arguments.of(List.of("project/feature", "")));
+    return Stream.of(Arguments.of("project/feature", ""));
   }
 
   @ParameterizedTest

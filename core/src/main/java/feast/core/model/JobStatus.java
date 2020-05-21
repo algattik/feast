@@ -17,6 +17,9 @@
 package feast.core.model;
 
 import feast.proto.core.IngestionJobProto.IngestionJobStatus;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,7 +54,15 @@ public enum JobStatus {
   /** job has been suspended */
   SUSPENDED;
 
-  private static final Set<JobStatus> TERMINAL_STATES = Set.of(COMPLETED, ABORTED, ERROR);
+  private static final Set<JobStatus> TERMINAL_STATES =
+      Collections.unmodifiableSet(
+          new HashSet<JobStatus>() {
+            {
+              add(COMPLETED);
+              add(ABORTED);
+              add(ERROR);
+            }
+          });
 
   /**
    * Get the set of terminal job states.
@@ -64,7 +75,15 @@ public enum JobStatus {
     return TERMINAL_STATES;
   }
 
-  private static final Set<JobStatus> TRANSITIONAL_STATES = Set.of(PENDING, ABORTING, SUSPENDING);
+  private static final Set<JobStatus> TRANSITIONAL_STATES =
+      Collections.unmodifiableSet(
+          new HashSet<JobStatus>() {
+            {
+              add(PENDING);
+              add(ABORTING);
+              add(SUSPENDING);
+            }
+          });
 
   /**
    * Get Transitional Job Status states. Transitional states are assigned to jobs that are
@@ -87,16 +106,20 @@ public enum JobStatus {
   }
 
   private static final Map<JobStatus, IngestionJobStatus> INGESTION_JOB_STATUS_MAP =
-      Map.of(
-          JobStatus.UNKNOWN, IngestionJobStatus.UNKNOWN,
-          JobStatus.PENDING, IngestionJobStatus.PENDING,
-          JobStatus.RUNNING, IngestionJobStatus.RUNNING,
-          JobStatus.COMPLETED, IngestionJobStatus.COMPLETED,
-          JobStatus.ABORTING, IngestionJobStatus.ABORTING,
-          JobStatus.ABORTED, IngestionJobStatus.ABORTED,
-          JobStatus.ERROR, IngestionJobStatus.ERROR,
-          JobStatus.SUSPENDING, IngestionJobStatus.SUSPENDING,
-          JobStatus.SUSPENDED, IngestionJobStatus.SUSPENDED);
+      Collections.unmodifiableMap(
+          new HashMap<JobStatus, IngestionJobStatus>() {
+            {
+              put(JobStatus.UNKNOWN, IngestionJobStatus.UNKNOWN);
+              put(JobStatus.PENDING, IngestionJobStatus.PENDING);
+              put(JobStatus.RUNNING, IngestionJobStatus.RUNNING);
+              put(JobStatus.COMPLETED, IngestionJobStatus.COMPLETED);
+              put(JobStatus.ABORTING, IngestionJobStatus.ABORTING);
+              put(JobStatus.ABORTED, IngestionJobStatus.ABORTED);
+              put(JobStatus.ERROR, IngestionJobStatus.ERROR);
+              put(JobStatus.SUSPENDING, IngestionJobStatus.SUSPENDING);
+              put(JobStatus.SUSPENDED, IngestionJobStatus.SUSPENDED);
+            }
+          });
 
   /**
    * Convert a Job Status to Ingestion Job Status proto

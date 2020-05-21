@@ -36,6 +36,8 @@ import feast.serving.exception.SpecRetrievalException;
 import feast.serving.specs.CachedSpecService;
 import feast.serving.specs.CoreSpecService;
 import feast.storage.api.retriever.FeatureSetRequest;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,20 +68,20 @@ public class CachedSpecServiceTest {
     this.setupFeatureSetAndStoreSubscription(
         "project",
         "fs1",
-        List.of(
+        Arrays.asList(
             FeatureSpec.newBuilder().setName("feature").build(),
             FeatureSpec.newBuilder().setName("feature2").build()));
 
     this.setupFeatureSetAndStoreSubscription(
         "default",
         "fs2",
-        List.of(
+        Arrays.asList(
             FeatureSpec.newBuilder().setName("feature3").build(),
             FeatureSpec.newBuilder().setName("feature4").build(),
             FeatureSpec.newBuilder().setName("feature5").build()));
 
     this.setupFeatureSetAndStoreSubscription(
-        "default", "fs3", List.of(FeatureSpec.newBuilder().setName("feature4").build()));
+        "default", "fs3", Arrays.asList(FeatureSpec.newBuilder().setName("feature4").build()));
 
     when(this.coreService.registerStore(store)).thenReturn(store);
     cachedSpecService = new CachedSpecService(this.coreService, this.store);
@@ -146,9 +148,9 @@ public class CachedSpecServiceTest {
             .build();
 
     assertThat(
-        cachedSpecService.getFeatureSets(List.of(fs1fr1, fs1fr2)),
+        cachedSpecService.getFeatureSets(Arrays.asList(fs1fr1, fs1fr2)),
         equalTo(
-            List.of(
+            Arrays.asList(
                 FeatureSetRequest.newBuilder()
                     .addFeatureReference(fs1fr1)
                     .addFeatureReference(fs1fr2)
@@ -165,9 +167,9 @@ public class CachedSpecServiceTest {
     FeatureReference fs2fr5 = FeatureReference.newBuilder().setName("feature5").build();
 
     assertThat(
-        cachedSpecService.getFeatureSets(List.of(fs2fr3, fs2fr5)),
+        cachedSpecService.getFeatureSets(Arrays.asList(fs2fr3, fs2fr5)),
         equalTo(
-            List.of(
+            Arrays.asList(
                 FeatureSetRequest.newBuilder()
                     .addFeatureReference(fs2fr3)
                     .addFeatureReference(fs2fr5)
@@ -186,9 +188,9 @@ public class CachedSpecServiceTest {
     FeatureReference fs2fr3 = FeatureReference.newBuilder().setName("feature3").build();
 
     assertThat(
-        cachedSpecService.getFeatureSets(List.of(fs1fr1, fs2fr3)),
+        cachedSpecService.getFeatureSets(Arrays.asList(fs1fr1, fs2fr3)),
         containsInAnyOrder(
-            List.of(
+            Arrays.asList(
                     FeatureSetRequest.newBuilder()
                         .addFeatureReference(fs1fr1)
                         .setSpec(featureSetSpecs.get("fs1"))
@@ -210,9 +212,9 @@ public class CachedSpecServiceTest {
         FeatureReference.newBuilder().setProject("default").setName("feature3").build();
 
     assertThat(
-        cachedSpecService.getFeatureSets(List.of(fs1fr1, fs2fr3)),
+        cachedSpecService.getFeatureSets(Arrays.asList(fs1fr1, fs2fr3)),
         containsInAnyOrder(
-            List.of(
+            Arrays.asList(
                     FeatureSetRequest.newBuilder()
                         .addFeatureReference(fs1fr1)
                         .setSpec(featureSetSpecs.get("fs1"))
@@ -233,9 +235,9 @@ public class CachedSpecServiceTest {
         FeatureReference.newBuilder().setProject("project").setName("feature2").build();
 
     assertThat(
-        cachedSpecService.getFeatureSets(List.of(fr1, fr2)),
+        cachedSpecService.getFeatureSets(Arrays.asList(fr1, fr2)),
         equalTo(
-            List.of(
+            Arrays.asList(
                 FeatureSetRequest.newBuilder()
                     .addFeatureReference(fr1)
                     .addFeatureReference(fr2)
@@ -253,6 +255,6 @@ public class CachedSpecServiceTest {
     FeatureReference fs3fr4 = FeatureReference.newBuilder().setName("feature4").build();
 
     expectedException.expect(SpecRetrievalException.class);
-    cachedSpecService.getFeatureSets(List.of(fs2fr4, fs3fr4));
+    cachedSpecService.getFeatureSets(Arrays.asList(fs2fr4, fs3fr4));
   }
 }

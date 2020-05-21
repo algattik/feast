@@ -78,7 +78,7 @@ public class OnlineServingService implements ServingService {
 
       // For each feature set request, read the feature rows returned by the retriever, and
       // populate the featureValuesMap with the feature values corresponding to that entity row.
-      for (var fsIdx = 0; fsIdx < featureRows.size(); fsIdx++) {
+      for (int fsIdx = 0; fsIdx < featureRows.size(); fsIdx++) {
         List<FeatureRow> featureRowsForFs = featureRows.get(fsIdx);
         FeatureSetRequest featureSetRequest = featureSetRequests.get(fsIdx);
 
@@ -90,7 +90,7 @@ public class OnlineServingService implements ServingService {
 
         // Each feature row returned (per feature set request) corresponds to a given entity row.
         // For each feature row, update the featureValuesMap.
-        for (var entityRowIdx = 0; entityRowIdx < entityRows.size(); entityRowIdx++) {
+        for (int entityRowIdx = 0; entityRowIdx < entityRows.size(); entityRowIdx++) {
           FeatureRow featureRow = featureRowsForFs.get(entityRowIdx);
           EntityRow entityRow = entityRows.get(entityRowIdx);
 

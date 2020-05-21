@@ -327,7 +327,7 @@ public class SpecServiceTest {
     FeatureSet featureSet = featureSets.get(1);
     List<Feature> features = Lists.newArrayList(featureSet.getFeatures());
     Collections.shuffle(features);
-    featureSet.setFeatures(Set.copyOf(features));
+    featureSet.setFeatures(new HashSet<Feature>(features));
     FeatureSetProto.FeatureSet incomingFeatureSet = featureSet.toProto();
 
     ApplyFeatureSetResponse applyFeatureSetResponse =
@@ -547,14 +547,14 @@ public class SpecServiceTest {
     entitySpecs.add(EntitySpec.newBuilder().setName("entity1").setValueType(Enum.INT64).build());
 
     Map<String, String> featureLabels0 =
-        new HashMap<>() {
+        new HashMap<String, String>() {
           {
             put("label1", "feast1");
           }
         };
 
     Map<String, String> featureLabels1 =
-        new HashMap<>() {
+        new HashMap<String, String>() {
           {
             put("label1", "feast1");
             put("label2", "feast2");
@@ -603,7 +603,7 @@ public class SpecServiceTest {
         new ArrayList<>(appliedFeatureSetSpec.getFeaturesList());
     appliedFeatureSpecs.sort(Comparator.comparing(FeatureSpec::getName));
 
-    var featureSpecsLabels =
+    List<Map<String, String>> featureSpecsLabels =
         featureSpecs.stream().map(e -> e.getLabelsMap()).collect(Collectors.toList());
     assertEquals(appliedEntitySpecs, entitySpecs);
     assertEquals(appliedFeatureSpecs, featureSpecs);
@@ -613,7 +613,7 @@ public class SpecServiceTest {
   @Test
   public void applyFeatureSetShouldAcceptFeatureSetLabels() throws InvalidProtocolBufferException {
     Map<String, String> featureSetLabels =
-        new HashMap<>() {
+        new HashMap<String, String>() {
           {
             put("description", "My precious feature set");
           }
@@ -631,7 +631,7 @@ public class SpecServiceTest {
     ApplyFeatureSetResponse applyFeatureSetResponse = specService.applyFeatureSet(featureSet);
     FeatureSetSpec appliedFeatureSetSpec = applyFeatureSetResponse.getFeatureSet().getSpec();
 
-    var appliedLabels = appliedFeatureSetSpec.getLabelsMap();
+    Map<String, String> appliedLabels = appliedFeatureSetSpec.getLabelsMap();
 
     assertEquals(featureSetLabels, appliedLabels);
   }

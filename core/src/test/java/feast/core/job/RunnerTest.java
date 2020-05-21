@@ -31,7 +31,7 @@ public class RunnerTest {
 
   @Test
   public void fromStringLoadsValueFromHumanReadableName() {
-    var humanName = Runner.DATAFLOW.toString();
+    String humanName = Runner.DATAFLOW.toString();
     assertThat(Runner.fromString(humanName), is(Runner.DATAFLOW));
   }
 

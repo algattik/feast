@@ -79,7 +79,7 @@ public class JobUpdateTask implements Callable<Job> {
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     Future<Job> submittedJob;
 
-    if (currentJob.isEmpty()) {
+    if (!currentJob.isPresent()) {
       submittedJob = executorService.submit(this::createJob);
     } else {
       Job job = currentJob.get();
@@ -130,19 +130,19 @@ public class JobUpdateTask implements Callable<Job> {
       logAudit(Action.SUBMIT, job, "Building graph and submitting to %s", runnerName);
 
       job = jobManager.startJob(job);
-      var extId = job.getExtId();
+      String extId = job.getExtId();
       if (extId.isEmpty()) {
         throw new RuntimeException(
             String.format("Could not submit job: \n%s", "unable to retrieve job external id"));
       }
 
-      var auditMessage = "Job submitted to runner %s with ext id %s.";
+      String auditMessage = "Job submitted to runner %s with ext id %s.";
       logAudit(Action.STATUS_CHANGE, job, auditMessage, runnerName, extId);
 
       return job;
     } catch (Exception e) {
       log.error(e.getMessage());
-      var auditMessage = "Job failed to be submitted to runner %s. Job status changed to ERROR.";
+      String auditMessage = "Job failed to be submitted to runner %s. Job status changed to ERROR.";
       logAudit(Action.STATUS_CHANGE, job, auditMessage, runnerName);
 
       job.setStatus(JobStatus.ERROR);
@@ -162,7 +162,7 @@ public class JobUpdateTask implements Callable<Job> {
     JobStatus currentStatus = job.getStatus();
     JobStatus newStatus = jobManager.getJobStatus(job);
     if (newStatus != currentStatus) {
-      var auditMessage = "Job status updated: changed from %s to %s";
+      String auditMessage = "Job status updated: changed from %s to %s";
       logAudit(Action.STATUS_CHANGE, job, auditMessage, currentStatus, newStatus);
     }
 

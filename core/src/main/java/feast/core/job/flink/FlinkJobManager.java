@@ -82,7 +82,8 @@ public class FlinkJobManager implements JobManager {
     }
     this.flinkRestApis = new FlinkRestApi(new RestTemplate(), config.getMasterUrl());
 
-    this.defaultOptions = Map.of("flinkMaster", runnerConfigOptions.get("masterUrl"));
+    this.defaultOptions =
+        Collections.singletonMap("flinkMaster", runnerConfigOptions.get("masterUrl"));
     this.metrics = metricsProperties;
   }
 
@@ -196,7 +197,7 @@ public class FlinkJobManager implements JobManager {
 
     try {
       // TODO use extId to make API call quicker
-      var flinkJob = getFlinkJob(job.getId());
+      FlinkJob flinkJob = getFlinkJob(job.getId());
       return FlinkJobStateMapper.map(flinkJob.getState());
     } catch (Exception e) {
       log.error(
@@ -292,7 +293,7 @@ public class FlinkJobManager implements JobManager {
 
   private FlinkJob waitForJobToRun(ImportOptions pipelineOptions, FlinkRunnerResult pipelineResult)
       throws RuntimeException, InterruptedException {
-    var job = getFlinkJob(pipelineOptions.getJobName());
+    FlinkJob job = getFlinkJob(pipelineOptions.getJobName());
     // TODO: add timeout
     while (true) {
       State state = pipelineResult.getState();

@@ -79,6 +79,11 @@
                   <shadedPattern>com.google.cloud.bigquery.vendor</shadedPattern>
                 </relocation>
               </relocations>
+              <artifactSet>
+                  <excludes>
+                      <exclude>org.apache.flink:*</exclude>
+                  </excludes>
+              </artifactSet>
             </configuration>
           </execution>
         </executions>
@@ -187,7 +192,7 @@
 
     <dependency>
       <groupId>org.apache.beam</groupId>
-      <artifactId>beam-runners-flink_2.11</artifactId>
+      <artifactId>beam-runners-flink-${org.apache.flink.version}</artifactId>
       <version>${org.apache.beam.version}</version>
     </dependency>
 

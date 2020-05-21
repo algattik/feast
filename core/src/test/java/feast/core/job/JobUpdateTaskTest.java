@@ -119,7 +119,7 @@ public class JobUpdateTaskTest {
 
   @Test
   public void shouldCreateJobIfNotPresent() {
-    var featureSets = Collections.singletonList(featureSet1);
+    List<FeatureSet> featureSets = Collections.singletonList(featureSet1);
     JobUpdateTask jobUpdateTask = spy(makeTask(featureSets, Optional.empty()));
     doReturn("job").when(jobUpdateTask).createJobId("KAFKA/servers:9092/topic", "test");
 
@@ -134,7 +134,7 @@ public class JobUpdateTaskTest {
 
   @Test
   public void shouldUpdateJobStatusIfNotCreateOrUpdate() {
-    var featureSets = Collections.singletonList(featureSet1);
+    List<FeatureSet> featureSets = Collections.singletonList(featureSet1);
     Job originalJob = makeJob("ext", featureSets, JobStatus.RUNNING);
     JobUpdateTask jobUpdateTask = makeTask(featureSets, Optional.of(originalJob));
 
@@ -146,7 +146,7 @@ public class JobUpdateTaskTest {
 
   @Test
   public void shouldReturnJobWithErrorStatusIfFailedToSubmit() {
-    var featureSets = Collections.singletonList(featureSet1);
+    List<FeatureSet> featureSets = Collections.singletonList(featureSet1);
     JobUpdateTask jobUpdateTask = spy(makeTask(featureSets, Optional.empty()));
     doReturn("job").when(jobUpdateTask).createJobId("KAFKA/servers:9092/topic", "test");
 
@@ -162,8 +162,8 @@ public class JobUpdateTaskTest {
 
   @Test
   public void shouldTimeout() {
-    var featureSets = Collections.singletonList(featureSet1);
-    var timeoutSeconds = 0L;
+    List<FeatureSet> featureSets = Collections.singletonList(featureSet1);
+    long timeoutSeconds = 0L;
     JobUpdateTask jobUpdateTask =
         spy(
             new JobUpdateTask(

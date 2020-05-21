@@ -33,7 +33,7 @@ public class FeatureSetValidatorTest {
   @Test
   public void shouldThrowExceptionForFeatureLabelsWithAnEmptyKey() {
     Map<String, String> featureLabels =
-        new HashMap<>() {
+        new HashMap<String, String>() {
           {
             put("", "empty_key");
           }
@@ -65,7 +65,7 @@ public class FeatureSetValidatorTest {
   public void shouldThrowExceptionForFeatureSetLabelsWithAnEmptyKey() {
 
     Map<String, String> featureSetLabels =
-        new HashMap<>() {
+        new HashMap<String, String>() {
           {
             put("", "empty_key");
           }

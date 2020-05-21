@@ -40,6 +40,8 @@ import feast.storage.api.retriever.OnlineRetriever;
 import io.lettuce.core.KeyValue;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import io.lettuce.core.cluster.api.sync.RedisAdvancedClusterCommands;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -133,7 +135,7 @@ public class RedisClusterOnlineRetrieverTest {
     when(syncCommands.mget(redisKeyList)).thenReturn(featureRowBytes);
 
     List<List<FeatureRow>> expected =
-        List.of(
+        Arrays.asList(
             Lists.newArrayList(
                 FeatureRow.newBuilder()
                     .setEventTimestamp(Timestamp.newBuilder().setSeconds(100))
@@ -153,7 +155,7 @@ public class RedisClusterOnlineRetrieverTest {
                     .build()));
 
     List<List<FeatureRow>> actual =
-        redisClusterOnlineRetriever.getOnlineFeatures(entityRows, List.of(featureSetRequest));
+        redisClusterOnlineRetriever.getOnlineFeatures(entityRows, Arrays.asList(featureSetRequest));
     assertThat(actual, equalTo(expected));
   }
 
@@ -201,7 +203,7 @@ public class RedisClusterOnlineRetrieverTest {
     when(syncCommands.mget(redisKeyList)).thenReturn(featureRowBytes);
 
     List<List<FeatureRow>> expected =
-        List.of(
+        Arrays.asList(
             Lists.newArrayList(
                 FeatureRow.newBuilder()
                     .setEventTimestamp(Timestamp.newBuilder().setSeconds(100))
@@ -220,7 +222,7 @@ public class RedisClusterOnlineRetrieverTest {
                     .build()));
 
     List<List<FeatureRow>> actual =
-        redisClusterOnlineRetriever.getOnlineFeatures(entityRows, List.of(featureSetRequest));
+        redisClusterOnlineRetriever.getOnlineFeatures(entityRows, Arrays.asList(featureSetRequest));
     assertThat(actual, equalTo(expected));
   }
 
