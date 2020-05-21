@@ -72,7 +72,8 @@ public class FlinkJobManager implements JobManager {
 
     org.apache.flink.configuration.Configuration configuration =
         GlobalConfiguration.loadConfiguration(config.getConfigDir());
-    List<CustomCommandLine<?>> customCommandLines = CliFrontend.loadCustomCommandLines(configuration, config.getConfigDir());
+    List<CustomCommandLine<?>> customCommandLines =
+        CliFrontend.loadCustomCommandLines(configuration, config.getConfigDir());
     try {
       this.flinkCli = new CliFrontend(configuration, customCommandLines);
     } catch (Exception e) {
