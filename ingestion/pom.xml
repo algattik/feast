@@ -187,6 +187,12 @@
 
     <dependency>
       <groupId>org.apache.beam</groupId>
+      <artifactId>beam-runners-flink_2.11</artifactId>
+      <version>${org.apache.beam.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.beam</groupId>
       <artifactId>beam-runners-direct-java</artifactId>
       <version>${org.apache.beam.version}</version>
     </dependency>

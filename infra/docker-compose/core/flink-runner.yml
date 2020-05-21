@@ -1,0 +1,22 @@
+feast:
+  jobs:
+    # Job update polling interval in milliseconds: how often Feast checks if new jobs should be sent to the runner.
+    polling_interval_milliseconds: 60000
+
+    # Timeout in seconds for each attempt to update or submit a new job to the runner.
+    job_update_timeout_seconds: 240
+
+    # Name of the active runner in "runners" that should be used. Only a single runner can be active at one time.
+    active_runner: flink
+
+    # List of runner configurations. Please see protos/feast/core/Runner.proto for more details
+    # Alternatively see the following for options https://api.docs.feast.dev/grpc/feast.core.pb.html#Runner
+    runners:
+      - name: flink
+        type: FlinkRunner
+        options:
+          masterUrl: http://localhost:9999
+          configDir: /etc
+  stream:
+    options:
+      bootstrapServers: kafka:9092

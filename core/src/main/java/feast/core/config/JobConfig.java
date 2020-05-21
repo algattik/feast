@@ -21,6 +21,7 @@ import feast.core.job.JobManager;
 import feast.core.job.dataflow.DataflowJobManager;
 import feast.core.job.direct.DirectJobRegistry;
 import feast.core.job.direct.DirectRunnerJobManager;
+import feast.core.job.flink.FlinkJobManager;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,8 @@ public class JobConfig {
     switch (runner.getType()) {
       case DATAFLOW:
         return new DataflowJobManager(runnerConfigOptions, metrics);
+      case FLINK:
+        return new FlinkJobManager(runnerConfigOptions, metrics);
       case DIRECT:
         return new DirectRunnerJobManager(runnerConfigOptions, new DirectJobRegistry(), metrics);
       default:

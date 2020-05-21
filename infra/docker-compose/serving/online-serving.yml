@@ -1,13 +1,16 @@
 feast:
   core-host: core
-  core-grpc-port: 6565
-  store:
-    config-path: /etc/feast/store.yml
-  jobs:
-    store-type: REDIS
-    store-options:
-      host: redis
-      port: 6379
 
-grpc:
-  port: 6566
+  # List of store configurations
+  stores:
+    - name: online # Name of the store (referenced by active_store)
+      type: REDIS # Type of the store. REDIS, BIGQUERY are available options
+      config:  # Store specific configuration. See
+        host: redis
+        port: 6379
+      # Subscriptions indicate which feature sets needs to be retrieved and used to populate this store
+      subscriptions:
+        # Wildcards match all options. No filtering is done.
+        - name: "*"
+          project: "*"
+
