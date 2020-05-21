@@ -2,11 +2,15 @@ version: "3.7"
 
 services:
   online-serving:
+    build:
+      context: ../..
+      dockerfile: infra/docker/serving/Dockerfile
     image: ${FEAST_SERVING_IMAGE}:${FEAST_VERSION}
     volumes:
       - ./serving/${FEAST_ONLINE_SERVING_CONFIG}:/etc/feast/application.yml
       - ./serving/${FEAST_ONLINE_STORE_CONFIG}:/etc/feast/store.yml
     depends_on:
+      - core
       - redis
     ports:
       - 6566:6566

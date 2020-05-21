@@ -11,5 +11,8 @@ pip install -r feast/sdk/python/requirements-ci.txt
 # Install Feast SDK
 pip install -e feast/sdk/python -U
 
+# Compile Feast Protobuf
+make -C feast compile-protos-python
+
 # Start Jupyter Notebook
 start-notebook.sh --NotebookApp.token=''
