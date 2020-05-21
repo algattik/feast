@@ -1,1 +1,1 @@
-jobmanager.rpc.address: flink
+rest.address: flink-jobmanager

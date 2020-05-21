@@ -15,7 +15,7 @@ feast:
       - name: flink
         type: FlinkRunner
         options:
-          masterUrl: http://localhost:9999
+          masterUrl: flink-jobmanager:8081
           configDir: /etc/feast
   stream:
     options:
