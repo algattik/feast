@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  flink-jobmanager:
+    image: ${FLINK_DOCKER_IMAGE_NAME:-flink:1.8}
+    expose:
+      - "6123"
+    ports:
+      - "8091:8081"
+    command: jobmanager
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=flink-jobmanager
+
+  flink-taskmanager:
+    image: ${FLINK_DOCKER_IMAGE_NAME:-flink:1.8}
+    ports:
+      - "6121"
+      - "6122"
+    depends_on:
+      - flink-jobmanager
+    command: taskmanager
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=flink-jobmanager

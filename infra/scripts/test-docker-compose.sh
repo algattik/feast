@@ -16,7 +16,7 @@ cd ${PROJECT_ROOT_DIR}/infra/docker-compose/
 cp .env.sample .env
 
 # Start Docker Compose containers
-docker-compose -f docker-compose.yml -f docker-compose.online.yml up -d
+docker-compose -f docker-compose.yml -f docker-compose.online.yml -f docker-compose.flink.yml up -d
 
 # Get Jupyter container IP address
 export JUPYTER_DOCKER_CONTAINER_IP_ADDRESS=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' feast_jupyter_1)
@@ -32,4 +32,4 @@ ${PROJECT_ROOT_DIR}/infra/scripts/wait-for-it.sh ${JUPYTER_DOCKER_CONTAINER_IP_A
 docker exec feast_jupyter_1 bash -c 'cd feast/tests/e2e/ && pytest -s basic-ingest-redis-serving.py --core_url core:6565 --serving_url=online-serving:6566'
 
 # Shut down docker-compose images
-docker-compose -f docker-compose.yml -f docker-compose.online.yml down
+docker-compose -f docker-compose.yml -f docker-compose.online.yml -f docker-compose.flink.yml down

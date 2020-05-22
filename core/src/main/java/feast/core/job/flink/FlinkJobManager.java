@@ -16,8 +16,6 @@
  */
 package feast.core.job.flink;
 
-import static feast.core.util.PipelineUtil.detectClassPathResourcesToStage;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import feast.core.config.FeastProperties.MetricsProperties;
@@ -29,7 +27,6 @@ import feast.core.model.FeatureSet;
 import feast.core.model.Job;
 import feast.core.model.JobStatus;
 import feast.core.model.Project;
-import feast.core.util.TypeConversion;
 import feast.ingestion.ImportJob;
 import feast.ingestion.options.BZip2Compressor;
 import feast.ingestion.options.ImportOptions;
@@ -39,14 +36,13 @@ import feast.proto.core.SourceProto;
 import feast.proto.core.StoreProto;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.beam.runners.flink.FlinkRunner;
 import org.apache.beam.runners.flink.FlinkRunnerResult;
-import org.apache.beam.sdk.PipelineResult.State;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.flink.client.cli.CliFrontend;
 import org.apache.flink.client.cli.CustomCommandLine;
 import org.apache.flink.configuration.GlobalConfiguration;
@@ -194,15 +190,18 @@ public class FlinkJobManager implements JobManager {
     if (job.getRunner() != RUNNER_TYPE) {
       return job.getStatus();
     }
+    return getJobStatus(job.getId());
+  }
+
+  private JobStatus getJobStatus(String jobName) {
 
     try {
-      // TODO use extId to make API call quicker
-      FlinkJob flinkJob = getFlinkJob(job.getId());
+      FlinkJob flinkJob = getFlinkJob(jobName);
       return FlinkJobStateMapper.map(flinkJob.getState());
     } catch (Exception e) {
       log.error(
           "Unable to retrieve status of a dataflow job with id : {}\ncause: {}",
-          job.getExtId(),
+          jobName,
           e.getMessage());
     }
 
@@ -216,10 +215,11 @@ public class FlinkJobManager implements JobManager {
       StoreProto.Store sink,
       boolean update) {
     try {
-      ImportOptions pipelineOptions = getPipelineOptions(jobName, featureSetProtos, sink, update);
-      FlinkRunnerResult pipelineResult = runPipeline(pipelineOptions);
-      FlinkJob job = waitForJobToRun(pipelineOptions, pipelineResult);
+      flinkCli.parseParameters(createRunArgs(jobName, featureSetProtos, sink, update));
+
+      FlinkJob job = waitForJobToRun(jobName);
       if (job == null) {
+        log.error("No ID returned for job");
         return null;
       }
       return job.jid;
@@ -229,93 +229,97 @@ public class FlinkJobManager implements JobManager {
     }
   }
 
-  private ImportOptions getPipelineOptions(
-      String jobName,
-      List<FeatureSetProto.FeatureSet> featureSets,
-      StoreProto.Store sink,
-      boolean update)
-      throws IOException {
-    String[] args = TypeConversion.convertMapToArgs(defaultOptions);
-    ImportOptions pipelineOptions = PipelineOptionsFactory.fromArgs(args).as(ImportOptions.class);
-
-    OptionCompressor<List<FeatureSetProto.FeatureSet>> featureSetJsonCompressor =
-        new BZip2Compressor<>(new FeatureSetJsonByteConverter());
-
-    pipelineOptions.setFeatureSetJson(featureSetJsonCompressor.compress(featureSets));
-    pipelineOptions.setStoreJson(Collections.singletonList(JsonFormat.printer().print(sink)));
-    pipelineOptions.setDefaultFeastProject(Project.DEFAULT_NAME);
-    // TODO pipelineOptions.setUpdate(update);
-    pipelineOptions.setRunner(FlinkRunner.class);
-    pipelineOptions.setJobName(jobName);
-    pipelineOptions.setFilesToStage(
-        detectClassPathResourcesToStage(FlinkRunner.class.getClassLoader()));
-    pipelineOptions.setFlinkMaster(config.getMasterUrl());
-    // pipelineOptions.setParallelism(Integer value);
-    // pipelineOptions.setMaxParallelism(Integer value);
-    // pipelineOptions.setCheckpointingInterval(Long interval);
-    // pipelineOptions.setCheckpointingMode(String mode);
-    // pipelineOptions.setCheckpointTimeoutMillis(Long checkpointTimeoutMillis);
-    // pipelineOptions.setMinPauseBetweenCheckpoints(Long minPauseInterval);
-    // pipelineOptions.setFailOnCheckpointingErrors(Boolean failOnCheckpointingErrors);
-    // pipelineOptions.setNumberOfExecutionRetries(Integer retries);
-    // pipelineOptions.setExecutionRetryDelay(Long delay);
-    // pipelineOptions.setObjectReuse(Boolean reuse);
-    // pipelineOptions.setStateBackendFactory(Class<? extends FlinkStateBackendFactory>
-    // stateBackendFactory);
-    // pipelineOptions.setEnableMetrics(Boolean enableMetrics);
-    // pipelineOptions.setExternalizedCheckpointsEnabled(Boolean externalCheckpoints);
-    // pipelineOptions.setRetainExternalizedCheckpointsOnCancellation(Boolean retainOnCancellation);
-    // pipelineOptions.setMaxBundleSize(Long size);
-    // pipelineOptions.setMaxBundleTimeMills(Long time);
-    // pipelineOptions.setShutdownSourcesOnFinalWatermark(Boolean shutdownOnFinalWatermark);
-    // pipelineOptions.setLatencyTrackingInterval(Long interval);
-    // pipelineOptions.setAutoWatermarkInterval(Long interval);
-    // pipelineOptions.setExecutionModeForBatch(String executionMode);
-    // pipelineOptions.setSavepointPath(String path);
-    // pipelineOptions.setAllowNonRestoredState(Boolean allowNonRestoredState);
-    // pipelineOptions.setAutoBalanceWriteFilesShardingEnabled(Boolean
-    // autoBalanceWriteFilesShardingEnabled);
-    pipelineOptions.setProject(""); // set to default value to satisfy validation
-
-    if (metrics.isEnabled()) {
-      pipelineOptions.setMetricsExporterType(metrics.getType());
-      if (metrics.getType().equals("statsd")) {
-        pipelineOptions.setStatsdHost(metrics.getHost());
-        pipelineOptions.setStatsdPort(metrics.getPort());
-      }
-    }
-    return pipelineOptions;
-  }
-
   public FlinkRunnerResult runPipeline(ImportOptions pipelineOptions) throws IOException {
     return (FlinkRunnerResult) ImportJob.runPipeline(pipelineOptions);
   }
 
-  private FlinkJob waitForJobToRun(ImportOptions pipelineOptions, FlinkRunnerResult pipelineResult)
-      throws RuntimeException, InterruptedException {
-    FlinkJob job = getFlinkJob(pipelineOptions.getJobName());
+  private FlinkJob waitForJobToRun(String jobName) throws RuntimeException, InterruptedException {
     // TODO: add timeout
     while (true) {
-      State state = pipelineResult.getState();
+      FlinkJob job = getFlinkJob(jobName);
+      JobStatus state = getJobStatus(jobName);
       if (state.isTerminal()) {
         throw new RuntimeException(
             String.format("Failed to submit flink job, job state is %s", state.toString()));
-      } else if (state.equals(State.RUNNING)) {
+      } else if (state.equals(JobStatus.RUNNING)) {
         return job;
       }
-      Thread.sleep(2000);
+      try {
+        Thread.sleep(2000);
+      } catch (InterruptedException e) {
+      }
     }
   }
 
-  private FlinkJob getFlinkJob(String jobId) {
+  private FlinkJob getFlinkJob(String jobName) {
     FlinkJobList jobList = flinkRestApis.getJobsOverview();
     for (FlinkJob job : jobList.getJobs()) {
-      if (jobId.equals(job.getName())) {
+      if (jobName.equals(job.getName())) {
         return job;
       }
     }
-    log.warn("Unable to find job: {}", jobId);
+    log.warn("Unable to find job: {}", jobName);
     return null;
+  }
+
+  private String[] createRunArgs(
+      String jobName,
+      List<FeatureSetProto.FeatureSet> featureSets,
+      StoreProto.Store sink,
+      // TODO update
+      boolean update)
+      throws IOException {
+    List<String> commands = new ArrayList<>();
+    commands.add("run");
+    commands.add("-d");
+    commands.add("-m");
+    commands.add(config.getMasterUrl());
+    commands.add("/opt/feast/feast-core/BOOT-INF/lib/feast-ingestion-dev.jar");
+
+    OptionCompressor<List<FeatureSetProto.FeatureSet>> featureSetJsonCompressor =
+        new BZip2Compressor<>(new FeatureSetJsonByteConverter());
+
+    commands.add(
+        option(
+            "featureSetJson",
+            String.format(
+                "\"%s\"",
+                Base64.getEncoder()
+                    .encodeToString(featureSetJsonCompressor.compress(featureSets)))));
+    commands.add(option("storeJson", JsonFormat.printer().print(sink)));
+    commands.add(option("defaultFeastProject", Project.DEFAULT_NAME));
+    commands.add(option("runner", FlinkRunner.class.getName()));
+    commands.add(option("jobName", jobName));
+    commands.add(option("project", "dummy"));
+    commands.add(
+        option("filesToStage", "/opt/feast/feast-core/BOOT-INF/lib/feast-ingestion-dev.jar"));
+
+    // Other available options:
+    // parallelism(Integer value);
+    // maxParallelism(Integer value);
+    // checkpointingInterval(Long interval);
+    // checkpointingMode(String mode);
+    // checkpointTimeoutMillis(Long checkpointTimeoutMillis);
+    // minPauseBetweenCheckpoints(Long minPauseInterval);
+    // failOnCheckpointingErrors(Boolean failOnCheckpointingErrors);
+    // numberOfExecutionRetries(Integer retries);
+    // executionRetryDelay(Long delay);
+    // objectReuse(Boolean reuse);
+    // stateBackendFactory(Class<? extends FlinkStateBackendFactory> stateBackendFactory);
+    // enableMetrics(Boolean enableMetrics);
+    // externalizedCheckpointsEnabled(Boolean externalCheckpoints);
+    // retainExternalizedCheckpointsOnCancellation(Boolean retainOnCancellation);
+    // maxBundleSize(Long size);
+    // maxBundleTimeMills(Long time);
+    // shutdownSourcesOnFinalWatermark(Boolean shutdownOnFinalWatermark);
+    // latencyTrackingInterval(Long interval);
+    // autoWatermarkInterval(Long interval);
+    // executionModeForBatch(String executionMode);
+    // savepointPath(String path);
+    // allowNonRestoredState(Boolean allowNonRestoredState);
+    // autoBalanceWriteFilesShardingEnabled(Boolean autoBalanceWriteFilesShardingEnabled);
+
+    return commands.toArray(new String[] {});
   }
 
   private String[] createStopArgs(String extId) {
@@ -325,5 +329,9 @@ public class FlinkJobManager implements JobManager {
     commands.add(config.getMasterUrl());
     commands.add(extId);
     return commands.toArray(new String[] {});
+  }
+
+  private String option(String key, String value) {
+    return String.format("--%s=%s", key, value);
   }
 }
