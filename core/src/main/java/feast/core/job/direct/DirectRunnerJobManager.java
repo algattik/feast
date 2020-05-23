@@ -152,7 +152,7 @@ public class DirectRunnerJobManager implements JobManager {
       job.abort();
     } catch (IOException e) {
       throw new RuntimeException(
-          Strings.lenientFormat("Unable to abort DirectRunner job %s", extId), e);
+          String.format("Unable to abort DirectRunner job %s", extId), e);
     }
     jobs.remove(extId);
   }
