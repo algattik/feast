@@ -25,9 +25,11 @@ import feast.serving.service.NoopJobService;
 import feast.serving.service.OnlineServingService;
 import feast.serving.service.ServingService;
 import feast.serving.specs.CachedSpecService;
+import feast.serving.util.Metrics;
 import feast.storage.api.retriever.HistoricalRetriever;
 import feast.storage.api.retriever.OnlineRetriever;
 import feast.storage.connectors.bigquery.retriever.BigQueryHistoricalRetriever;
+import feast.storage.connectors.cassandra.retriever.CassandraOnlineRetriever;
 import feast.storage.connectors.redis.retriever.RedisOnlineRetriever;
 import feast.storage.connectors.rediscluster.retriever.RedisClusterOnlineRetriever;
 import io.opentracing.Tracer;
@@ -71,6 +73,9 @@ public class ServingServiceConfig {
         servingService = new HistoricalServingService(bqRetriever, specService, jobService);
         break;
       case CASSANDRA:
+        OnlineRetriever cassandraRetriever = CassandraOnlineRetriever.create(config, tracer, Metrics.requestLatency);
+        servingService = new OnlineServingService(cassandraRetriever, specService, tracer);
+        break;
       case UNRECOGNIZED:
       case INVALID:
         throw new IllegalArgumentException(

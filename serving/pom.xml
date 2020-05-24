@@ -113,6 +113,12 @@
       <artifactId>feast-storage-connector-bigquery</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <dependency>
+      <groupId>dev.feast</groupId>
+      <artifactId>feast-storage-connector-cassandra</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- TODO: SLF4J is being used via Lombok, but also jog4j - pick one -->
     <dependency>
