@@ -21,8 +21,6 @@ import com.datastax.driver.core.TableMetadata;
 import com.datastax.driver.core.schemabuilder.Create;
 import com.datastax.driver.core.schemabuilder.SchemaBuilder;
 import feast.proto.core.StoreProto.Store.CassandraConfig;
-import feast.proto.core.StoreProto.Store.CassandraReplicationOptions;
-import feast.proto.core.StoreProto.Store.CassandraReplicationOptions.Builder;
 import feast.storage.connectors.cassandra.common.TestUtil;
 import feast.storage.connectors.cassandra.common.TestUtil.LocalCassandra;
 import java.io.IOException;
@@ -49,18 +47,14 @@ public class CassandraStoreUtilIT {
   @Test
   public void setupCassandra_shouldCreateKeyspaceAndTable() {
 
-    Builder replication =
-        CassandraReplicationOptions.newBuilder()
-            .setClass_("SimpleStrategy")
-            .setReplicationFactor(3);
-
     CassandraConfig config =
         CassandraConfig.newBuilder()
             .setBootstrapHosts(LocalCassandra.getHost())
             .setPort(LocalCassandra.getPort())
             .setKeyspace("test")
             .setTableName("feature_store")
-            .setReplicationOptions(replication)
+            .setReplicationStrategyClass("SimpleStrategy")
+            .setReplicationStrategyReplicationFactor(1)
             .build();
     TestUtil.setupCassandra(config);
 
@@ -83,18 +77,14 @@ public class CassandraStoreUtilIT {
   @Test
   public void setupCassandra_shouldBeIdempotent_whenTableAlreadyExistsAndSchemaMatches() {
 
-    Builder replication =
-        CassandraReplicationOptions.newBuilder()
-            .setClass_("SimpleStrategy")
-            .setReplicationFactor(2);
-
     CassandraConfig config =
         CassandraConfig.newBuilder()
             .setBootstrapHosts(LocalCassandra.getHost())
             .setPort(LocalCassandra.getPort())
             .setKeyspace("test")
             .setTableName("feature_store")
-            .setReplicationOptions(replication)
+            .setReplicationStrategyClass("SimpleStrategy")
+            .setReplicationStrategyReplicationFactor(2)
             .build();
 
     LocalCassandra.createKeyspaceAndTable(config);
@@ -111,18 +101,14 @@ public class CassandraStoreUtilIT {
 
   @Test(expected = RuntimeException.class)
   public void setupCassandra_shouldThrowException_whenTableNameDoesNotMatchObjectMapper() {
-    Builder replication =
-        CassandraReplicationOptions.newBuilder()
-            .setClass_("SimpleStrategy")
-            .setReplicationFactor(1);
-
     CassandraConfig config =
         CassandraConfig.newBuilder()
             .setBootstrapHosts(LocalCassandra.getHost())
             .setPort(LocalCassandra.getPort())
             .setKeyspace("test")
             .setTableName("test_data_store")
-            .setReplicationOptions(replication)
+            .setReplicationStrategyClass("SimpleStrategy")
+            .setReplicationStrategyReplicationFactor(1)
             .build();
     TestUtil.setupCassandra(config);
   }
@@ -144,18 +130,14 @@ public class CassandraStoreUtilIT {
             .addColumn(CassandraMutation.VALUE, DataType.blob());
     LocalCassandra.getSession().execute(createTable);
 
-    Builder replication =
-        CassandraReplicationOptions.newBuilder()
-            .setClass_("SimpleStrategy")
-            .setReplicationFactor(1);
-
     CassandraConfig config =
         CassandraConfig.newBuilder()
             .setBootstrapHosts(LocalCassandra.getHost())
             .setPort(LocalCassandra.getPort())
             .setKeyspace("test")
             .setTableName("feature_store")
-            .setReplicationOptions(replication)
+            .setReplicationStrategyClass("SimpleStrategy")
+            .setReplicationStrategyReplicationFactor(1)
             .build();
 
     TestUtil.setupCassandra(config);

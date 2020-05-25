@@ -133,11 +133,6 @@ message Store {
     int32 total_timeout_seconds = 5;
   }
 
-  message CassandraReplicationOptions {
-    string class = 1;
-    int32 replication_factor = 2;
-  }
-
   message CassandraConfig {
     // - bootstrapHosts: [comma delimited value of hosts]
     string bootstrap_hosts = 1;
@@ -148,13 +143,14 @@ message Store {
     // datastax object mapper
     string table_name = 4;
 
-    // This specifies the replication strategy to use. Please refer to docs for more details:
-    // https://docs.datastax.com/en/dse/6.7/cql/cql/cql_reference/cql_commands/cqlCreateKeyspace.html#cqlCreateKeyspace__cqlCreateKeyspacereplicationmap-Pr3yUQ7t
-    CassandraReplicationOptions replication_options = 5;
-
     // Default expiration in seconds to use when FeatureSetSpec does not have max_age defined.
     // Specify 0 for no default expiration
-    google.protobuf.Duration default_ttl = 6;
+    google.protobuf.Duration default_ttl = 5;
+
+    // This specifies the replication strategy to use. Please refer to docs for more details:
+    // https://docs.datastax.com/en/dse/6.7/cql/cql/cql_reference/cql_commands/cqlCreateKeyspace.html#cqlCreateKeyspace__cqlCreateKeyspacereplicationmap-Pr3yUQ7t
+    string replication_strategy_class = 6;
+    int32 replication_strategy_replication_factor = 7;
   }
 
   message RedisClusterConfig {

@@ -57,8 +57,12 @@ public abstract class CassandraStore {
       if (keyspaceMetadata == null) {
         log.info("Creating keyspace '{}'", keyspace);
         Map<String, Object> replicationOptions =
-            cassandraConfig.getReplicationOptions().getAllFields().entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().getName(), Entry::getValue));
+            cassandraConfig.getAllFields().entrySet().stream()
+                .filter(e -> e.getKey().getName().startsWith("replication_strategy_"))
+                .collect(
+                    Collectors.toMap(
+                        e -> e.getKey().getName().replace("replication_strategy_", ""),
+                        Entry::getValue));
         KeyspaceOptions createKeyspace =
             SchemaBuilder.createKeyspace(keyspace)
                 .ifNotExists()
