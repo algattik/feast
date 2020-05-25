@@ -39,7 +39,6 @@ import feast.storage.api.writer.FeatureSink;
 import feast.storage.api.writer.WriteResult;
 import feast.storage.connectors.bigquery.writer.BigQueryDeadletterSink;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,9 +90,9 @@ public class ImportJob {
     List<String> featureSetJson = decompressor.decompress(options.getFeatureSetJson());
     List<FeatureSet> featureSets = SpecUtil.parseFeatureSetSpecJsonList(featureSetJson);
     // FIXME temp workaround for parser splitting string at ","
-    //options.setStoreJson(
-        //Arrays.asList(
-            //"{\"name\":\"online\",\"type\":\"REDIS\",\"subscriptions\":[{\"name\":\"*\",\"project\":\"*\"}],\"redisConfig\":{\"host\":\"redis\",\"port\":6379}}"));
+    // options.setStoreJson(
+    // Arrays.asList(
+    // "{\"name\":\"online\",\"type\":\"REDIS\",\"subscriptions\":[{\"name\":\"*\",\"project\":\"*\"}],\"redisConfig\":{\"host\":\"redis\",\"port\":6379}}"));
     List<Store> stores = SpecUtil.parseStoreJsonList(options.getStoreJson());
 
     for (Store store : stores) {
