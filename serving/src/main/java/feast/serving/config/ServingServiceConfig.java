@@ -73,7 +73,8 @@ public class ServingServiceConfig {
         servingService = new HistoricalServingService(bqRetriever, specService, jobService);
         break;
       case CASSANDRA:
-        OnlineRetriever cassandraRetriever = CassandraOnlineRetriever.create(config, tracer, Metrics.requestLatency);
+        OnlineRetriever cassandraRetriever =
+            CassandraOnlineRetriever.create(config, tracer, Metrics.requestLatency);
         servingService = new OnlineServingService(cassandraRetriever, specService, tracer);
         break;
       case UNRECOGNIZED:

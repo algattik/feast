@@ -16,12 +16,16 @@
  */
 package feast.storage.connectors.cassandra.writer;
 
-
-import java.io.Serializable;
+import com.google.protobuf.Duration;
+import feast.proto.core.FeatureSetProto.FeatureSetSpec;
+import feast.proto.types.FeatureRowProto.FeatureRow;
+import feast.proto.types.ValueProto.Value;
+import feast.proto.types.ValueProto.ValueType.Enum;
+import feast.storage.connectors.cassandra.common.TestUtil;
 import feast.storage.connectors.cassandra.writer.CassandraCustomIO.WriteDoFn;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
@@ -30,19 +34,8 @@ import org.apache.beam.sdk.values.PCollection;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.google.protobuf.Duration;
-
-import feast.proto.core.FeatureSetProto.FeatureSet;
-import feast.proto.core.FeatureSetProto.FeatureSetSpec;
-import feast.proto.core.StoreProto.Store.CassandraConfig;
-import feast.proto.types.FeatureRowProto.FeatureRow;
-import feast.proto.types.ValueProto.Value;
-import feast.proto.types.ValueProto.ValueType.Enum;
-import feast.storage.connectors.cassandra.common.TestUtil;
-import feast.storage.connectors.cassandra.writer.CassandraMutation;
-
 public class WriteDoFnTest implements Serializable {
-	
+
   @Rule public transient TestPipeline testPipeline = TestPipeline.create();
 
   @Test
@@ -76,19 +69,18 @@ public class WriteDoFnTest implements Serializable {
 
     PCollection<FeatureRow> input = testPipeline.apply(Create.of(featureRow));
 
-    PCollection<CassandraMutation> output = input.apply(
-	    ParDo.of(
-	        new WriteDoFn(
-	            new HashMap<String, FeatureSetSpec>() {
-	              {
-	                put(
-	                    featureSetSpec.getProject()
-	                        + "/"
-	                        + featureSetSpec.getName(),
-	                        featureSetSpec);
-	              }
-	            },
-	            Duration.newBuilder().setSeconds(0).build())));
+    PCollection<CassandraMutation> output =
+        input.apply(
+            ParDo.of(
+                new WriteDoFn(
+                    new HashMap<String, FeatureSetSpec>() {
+                      {
+                        put(
+                            featureSetSpec.getProject() + "/" + featureSetSpec.getName(),
+                            featureSetSpec);
+                      }
+                    },
+                    Duration.newBuilder().setSeconds(0).build())));
 
     CassandraMutation[] expected =
         new CassandraMutation[] {
@@ -148,10 +140,8 @@ public class WriteDoFnTest implements Serializable {
                     new HashMap<String, FeatureSetSpec>() {
                       {
                         put(
-                            featureSetSpec.getProject()
-                                + "/"
-                                + featureSetSpec.getName(),
-                                featureSetSpec);
+                            featureSetSpec.getProject() + "/" + featureSetSpec.getName(),
+                            featureSetSpec);
                       }
                     },
                     Duration.newBuilder().setSeconds(0).build())));
@@ -216,10 +206,8 @@ public class WriteDoFnTest implements Serializable {
                     new HashMap<String, FeatureSetSpec>() {
                       {
                         put(
-                            featureSetSpec.getProject()
-                                + "/"
-                                + featureSetSpec.getName(),
-                                featureSetSpec);
+                            featureSetSpec.getProject() + "/" + featureSetSpec.getName(),
+                            featureSetSpec);
                       }
                     },
                     defaultTtl)));

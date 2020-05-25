@@ -18,7 +18,6 @@ package feast.storage.connectors.cassandra.writer;
 
 import com.datastax.driver.core.Session;
 import com.datastax.driver.mapping.MappingManager;
-
 import org.apache.beam.sdk.io.cassandra.Mapper;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 

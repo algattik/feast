@@ -25,7 +25,6 @@ import feast.proto.core.FeatureSetProto.FeatureSetSpec;
 import feast.proto.types.FeatureRowProto.FeatureRow;
 import feast.proto.types.FieldProto.Field;
 import feast.storage.connectors.cassandra.common.ValueUtil;
-
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;

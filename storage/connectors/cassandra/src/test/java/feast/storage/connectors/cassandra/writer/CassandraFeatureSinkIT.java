@@ -16,32 +16,12 @@
  */
 package feast.storage.connectors.cassandra.writer;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.beam.sdk.testing.TestPipeline;
-import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.values.PCollection;
-import org.apache.thrift.transport.TTransportException;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.google.protobuf.InvalidProtocolBufferException;
-
 import feast.proto.core.FeatureSetProto.FeatureSetSpec;
 import feast.proto.core.StoreProto.Store.CassandraConfig;
 import feast.proto.types.FeatureRowProto.FeatureRow;
@@ -51,6 +31,22 @@ import feast.proto.types.ValueProto.ValueType.Enum;
 import feast.storage.api.writer.FeatureSink;
 import feast.storage.connectors.cassandra.common.TestUtil;
 import feast.storage.connectors.cassandra.common.TestUtil.LocalCassandra;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.beam.sdk.testing.TestPipeline;
+import org.apache.beam.sdk.transforms.Create;
+import org.apache.beam.sdk.values.PCollection;
+import org.apache.thrift.transport.TTransportException;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class CassandraFeatureSinkIT implements Serializable {
   private FeatureSetSpec featureSetSpec;
@@ -72,16 +68,15 @@ public class CassandraFeatureSinkIT implements Serializable {
         .build();
   }
 
-    private Map<String, FeatureSetSpec> getFeatureSetSpecs() {
-      return new HashMap<String, FeatureSetSpec>() {
-        {
-          put(
-				String.format("%s/%s", featureSetSpec.getProject(), featureSetSpec.getName()),
-              featureSetSpec
-              );
-        }
-      };
-    }
+  private Map<String, FeatureSetSpec> getFeatureSetSpecs() {
+    return new HashMap<String, FeatureSetSpec>() {
+      {
+        put(
+            String.format("%s/%s", featureSetSpec.getProject(), featureSetSpec.getName()),
+            featureSetSpec);
+      }
+    };
+  }
 
   @BeforeClass
   public static void startServer() throws InterruptedException, IOException, TTransportException {
@@ -132,7 +127,6 @@ public class CassandraFeatureSinkIT implements Serializable {
   @Test
   public void testWriteCassandra_happyPath() throws InvalidProtocolBufferException {
     PCollection<FeatureRow> input = testPipeline.apply(Create.of(row));
-
 
     FeatureSink sink = CassandraFeatureSink.fromConfig(getCassandraConfig(), getFeatureSetSpecs());
     input.apply(sink.writer());

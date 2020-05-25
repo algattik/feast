@@ -23,7 +23,6 @@ import com.datastax.driver.core.schemabuilder.SchemaBuilder;
 import feast.proto.core.StoreProto.Store.CassandraConfig;
 import feast.storage.connectors.cassandra.common.TestUtil;
 import feast.storage.connectors.cassandra.common.TestUtil.LocalCassandra;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

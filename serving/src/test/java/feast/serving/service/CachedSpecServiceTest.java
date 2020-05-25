@@ -36,7 +36,6 @@ import feast.serving.exception.SpecRetrievalException;
 import feast.serving.specs.CachedSpecService;
 import feast.serving.specs.CoreSpecService;
 import feast.storage.api.retriever.FeatureSetRequest;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

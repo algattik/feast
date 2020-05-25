@@ -13,11 +13,6 @@
     <name>Feast Storage Connector for Cassandra</name>
 
     <dependencies>
-    <dependency>
-      <groupId>io.pebbletemplates</groupId>
-      <artifactId>pebble</artifactId>
-      <version>3.1.0</version>
-    </dependency>
 
 	<!-- Align cassandra SDK versions to Beam's -->
     <dependency>

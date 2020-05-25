@@ -19,44 +19,44 @@ package feast.storage.connectors.cassandra.writer;
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.mapping.Mapper.Option;
-
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.concurrent.Future;
 import org.apache.beam.sdk.io.cassandra.Mapper;
 
-/**
- * A {@link Mapper} that supports writing {@code CassandraMutation}s with the
- * Beam Cassandra IO.
- */
+/** A {@link Mapper} that supports writing {@code CassandraMutation}s with the Beam Cassandra IO. */
 public class CassandraMutationMapper implements Mapper<CassandraMutation>, Serializable {
 
-	private com.datastax.driver.mapping.Mapper<CassandraMutation> mapper;
+  private com.datastax.driver.mapping.Mapper<CassandraMutation> mapper;
 
-	CassandraMutationMapper(com.datastax.driver.mapping.Mapper<CassandraMutation> mapper) {
-		this.mapper = mapper;
-	}
+  CassandraMutationMapper(com.datastax.driver.mapping.Mapper<CassandraMutation> mapper) {
+    this.mapper = mapper;
+  }
 
-	@Override
-	public Iterator<CassandraMutation> map(ResultSet resultSet) {
-		throw new UnsupportedOperationException("Only supports write operations");
-	}
+  @Override
+  public Iterator<CassandraMutation> map(ResultSet resultSet) {
+    throw new UnsupportedOperationException("Only supports write operations");
+  }
 
-	@Override
-	public Future<Void> deleteAsync(CassandraMutation entityClass) {
-		throw new UnsupportedOperationException("Only supports write operations");
-	}
+  @Override
+  public Future<Void> deleteAsync(CassandraMutation entityClass) {
+    throw new UnsupportedOperationException("Only supports write operations");
+  }
 
-	/**
-	 * Saves records to Cassandra with: - Cassandra's internal write time set to the
-	 * timestamp of the record. Cassandra will not override an existing record with
-	 * the same partition key if the write time is older - Expiration of the record
-	 *
-	 * @param entityClass Cassandra's object mapper
-	 */
-	@Override
-	public Future<Void> saveAsync(CassandraMutation entityClass) {
-		return mapper.saveAsync(entityClass, Option.timestamp(entityClass.getWriteTime()),
-				Option.ttl(entityClass.getTtl()), Option.consistencyLevel(ConsistencyLevel.ALL), Option.tracing(true));
-	}
+  /**
+   * Saves records to Cassandra with: - Cassandra's internal write time set to the timestamp of the
+   * record. Cassandra will not override an existing record with the same partition key if the write
+   * time is older - Expiration of the record
+   *
+   * @param entityClass Cassandra's object mapper
+   */
+  @Override
+  public Future<Void> saveAsync(CassandraMutation entityClass) {
+    return mapper.saveAsync(
+        entityClass,
+        Option.timestamp(entityClass.getWriteTime()),
+        Option.ttl(entityClass.getTtl()),
+        Option.consistencyLevel(ConsistencyLevel.ALL),
+        Option.tracing(true));
+  }
 }
