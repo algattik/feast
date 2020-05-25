@@ -27,9 +27,7 @@ import feast.proto.types.FieldProto.Field;
 import feast.storage.api.writer.FailedElement;
 import feast.storage.api.writer.WriteResult;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -136,10 +134,10 @@ public class CassandraCustomIO {
                 .collect(Collectors.toSet());
         String key = CassandraMutation.keyFromFeatureRow(featureSetSpec, featureRow);
 
-        Collection<CassandraMutation> mutations = new ArrayList<>();
         for (Field field : featureRow.getFieldsList()) {
           if (featureNames.contains(field.getName())) {
-            mutations.add(
+            context.output(
+                mutationsTag,
                 new CassandraMutation(
                     key,
                     field.getName(),

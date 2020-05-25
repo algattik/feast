@@ -87,7 +87,7 @@ public class WriteDoFnTest implements Serializable {
     CassandraMutation[] expected =
         new CassandraMutation[] {
           new CassandraMutation(
-              "test_project/fs:1:entity1=1",
+              "test_project/fs:entity1=1",
               "feature1",
               ByteBuffer.wrap(TestUtil.strValue("a").toByteArray()),
               10000000,
@@ -150,13 +150,13 @@ public class WriteDoFnTest implements Serializable {
     CassandraMutation[] expected =
         new CassandraMutation[] {
           new CassandraMutation(
-              "test_project/fs:1:entity1=1|entity2=b",
+              "test_project/fs:entity1=1|entity2=b",
               "feature1",
               ByteBuffer.wrap(TestUtil.strValue("a").toByteArray()),
               10000000,
               10),
           new CassandraMutation(
-              "test_project/fs:1:entity1=1|entity2=b",
+              "test_project/fs:entity1=1|entity2=b",
               "feature2",
               ByteBuffer.wrap(TestUtil.intValue(2).toByteArray()),
               10000000,
@@ -215,7 +215,7 @@ public class WriteDoFnTest implements Serializable {
     CassandraMutation[] expected =
         new CassandraMutation[] {
           new CassandraMutation(
-              "test_project/fs:1:entity1=1",
+              "test_project/fs:entity1=1",
               "feature1",
               ByteBuffer.wrap(TestUtil.strValue("a").toByteArray()),
               10000000,
