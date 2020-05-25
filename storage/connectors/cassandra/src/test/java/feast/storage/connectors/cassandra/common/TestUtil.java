@@ -77,27 +77,6 @@ public class TestUtil {
    * Create a Feature Set Spec.
    *
    * @param name name of the feature set
-   * @param version version of the feature set
-   * @param maxAgeSeconds max age
-   * @param entities entities provided as map of string to {@link Enum}
-   * @param features features provided as map of string to {@link Enum}
-   * @return {@link FeatureSetSpec}
-   */
-  @Deprecated
-  public static FeatureSetSpec createFeatureSetSpec(
-      String name,
-      String project,
-      int version,
-      int maxAgeSeconds,
-      Map<String, Enum> entities,
-      Map<String, Enum> features) {
-    return createFeatureSetSpec(name, project, maxAgeSeconds, entities, features);
-  }
-
-  /**
-   * Create a Feature Set Spec.
-   *
-   * @param name name of the feature set
    * @param maxAgeSeconds max age
    * @param entities entities provided as map of string to {@link Enum}
    * @param features features provided as map of string to {@link Enum}

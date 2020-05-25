@@ -48,11 +48,10 @@ import org.slf4j.LoggerFactory;
 
 public class CassandraCustomIO {
 
-  private static TupleTag<CassandraMutation> mutationsTag =
-      new TupleTag<CassandraMutation>("mutations") {};
-  private static TupleTag<FeatureRow> successfulInsertsTag =
+  static TupleTag<CassandraMutation> mutationsTag = new TupleTag<CassandraMutation>("mutations") {};
+  static TupleTag<FeatureRow> successfulInsertsTag =
       new TupleTag<FeatureRow>("successfulInserts") {};
-  private static TupleTag<FailedElement> failedInsertsTupleTag =
+  static TupleTag<FailedElement> failedInsertsTupleTag =
       new TupleTag<FailedElement>("failedInserts") {};
 
   private static final Logger log = LoggerFactory.getLogger(CassandraCustomIO.class);
