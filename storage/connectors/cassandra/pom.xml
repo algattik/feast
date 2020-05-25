@@ -14,35 +14,47 @@
 
     <dependencies>
 
-	<!-- Align cassandra SDK versions to Beam's -->
-    <dependency>
-      <groupId>org.apache.beam</groupId>
-      <artifactId>beam-sdks-java-io-cassandra</artifactId>
-      <version>${org.apache.beam.version}</version>
-    </dependency>
-    
-        <!--compile 'io.jaegertracing:jaeger-client:0.31.0'-->
-    <dependency>
-      <groupId>io.jaegertracing</groupId>
-      <artifactId>jaeger-client</artifactId>
-      <version>0.31.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.opentracing</groupId>
-      <artifactId>opentracing-api</artifactId>
-      <version>0.31.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.opentracing</groupId>
-      <artifactId>opentracing-noop</artifactId>
-      <version>0.31.0</version>
-    </dependency>
-    <!-- The client -->
-    <dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient</artifactId>
-    </dependency>
+        <!-- Align cassandra SDK versions to Beam's -->
+        <dependency>
+            <groupId>org.apache.beam</groupId>
+            <artifactId>beam-sdks-java-io-cassandra</artifactId>
+            <version>${org.apache.beam.version}</version>
+        </dependency>
 
+        <!--compile 'io.jaegertracing:jaeger-client:0.31.0'-->
+        <dependency>
+            <groupId>io.jaegertracing</groupId>
+            <artifactId>jaeger-client</artifactId>
+            <version>0.31.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.opentracing</groupId>
+            <artifactId>opentracing-api</artifactId>
+            <version>0.31.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.opentracing</groupId>
+            <artifactId>opentracing-noop</artifactId>
+            <version>0.31.0</version>
+        </dependency>
+        <!-- The client -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value-annotations</artifactId>
+            <version>1.6.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value</artifactId>
+            <version>1.6.6</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
@@ -51,13 +63,13 @@
             <scope>test</scope>
         </dependency>
 
-    <!--testCompile 'org.cassandraunit:cassandra-unit-shaded:3.11.2.0'-->
-    <dependency>
-      <groupId>org.cassandraunit</groupId>
-      <artifactId>cassandra-unit-shaded</artifactId>
-      <version>3.11.2.0</version>
-      <scope>test</scope>
-    </dependency>
+        <!--testCompile 'org.cassandraunit:cassandra-unit-shaded:3.11.2.0'-->
+        <dependency>
+            <groupId>org.cassandraunit</groupId>
+            <artifactId>cassandra-unit-shaded</artifactId>
+            <version>3.11.2.0</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
