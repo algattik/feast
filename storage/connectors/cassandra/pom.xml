@@ -62,6 +62,12 @@
             <version>${org.apache.beam.version}</version>
             <scope>test</scope>
         </dependency>
+        
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-jmx</artifactId>
+			<scope>test</scope>
+		</dependency>
 
         <dependency>
             <groupId>junit</groupId>

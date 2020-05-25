@@ -21,6 +21,8 @@ import com.datastax.driver.core.TableMetadata;
 import com.datastax.driver.core.schemabuilder.Create;
 import com.datastax.driver.core.schemabuilder.SchemaBuilder;
 import feast.proto.core.StoreProto.Store.CassandraConfig;
+import feast.proto.core.StoreProto.Store.CassandraReplicationOptions;
+import feast.proto.core.StoreProto.Store.CassandraReplicationOptions.Builder;
 import feast.storage.connectors.cassandra.common.TestUtil;
 import feast.storage.connectors.cassandra.common.TestUtil.LocalCassandra;
 import java.io.IOException;
@@ -46,20 +48,19 @@ public class CassandraStoreUtilIT {
 
   @Test
   public void setupCassandra_shouldCreateKeyspaceAndTable() {
+
+    Builder replication =
+        CassandraReplicationOptions.newBuilder()
+            .setClass_("SimpleStrategy")
+            .setReplicationFactor(3);
+
     CassandraConfig config =
         CassandraConfig.newBuilder()
             .setBootstrapHosts(LocalCassandra.getHost())
             .setPort(LocalCassandra.getPort())
             .setKeyspace("test")
             .setTableName("feature_store")
-            .putAllReplicationOptions(
-                new HashMap<String, String>() {
-                  {
-                    put("class", "NetworkTopologyStrategy");
-                    put("dc1", "2");
-                    put("dc2", "3");
-                  }
-                })
+            .setReplicationOptions(replication)
             .build();
     TestUtil.setupCassandra(config);
 
@@ -68,9 +69,8 @@ public class CassandraStoreUtilIT {
     Map<String, String> expectedReplication =
         new HashMap<String, String>() {
           {
-            put("class", "org.apache.cassandra.locator.NetworkTopologyStrategy");
-            put("dc1", "2");
-            put("dc2", "3");
+            put("class", "org.apache.cassandra.locator.SimpleStrategy");
+            put("replication_factor", "1");
           }
         };
     TableMetadata tableMetadata =
@@ -82,19 +82,19 @@ public class CassandraStoreUtilIT {
 
   @Test
   public void setupCassandra_shouldBeIdempotent_whenTableAlreadyExistsAndSchemaMatches() {
+
+    Builder replication =
+        CassandraReplicationOptions.newBuilder()
+            .setClass_("SimpleStrategy")
+            .setReplicationFactor(2);
+
     CassandraConfig config =
         CassandraConfig.newBuilder()
             .setBootstrapHosts(LocalCassandra.getHost())
             .setPort(LocalCassandra.getPort())
             .setKeyspace("test")
             .setTableName("feature_store")
-            .putAllReplicationOptions(
-                new HashMap<String, String>() {
-                  {
-                    put("class", "SimpleStrategy");
-                    put("replication_factor", "2");
-                  }
-                })
+            .setReplicationOptions(replication)
             .build();
 
     LocalCassandra.createKeyspaceAndTable(config);
@@ -111,20 +111,18 @@ public class CassandraStoreUtilIT {
 
   @Test(expected = RuntimeException.class)
   public void setupCassandra_shouldThrowException_whenTableNameDoesNotMatchObjectMapper() {
+    Builder replication =
+        CassandraReplicationOptions.newBuilder()
+            .setClass_("SimpleStrategy")
+            .setReplicationFactor(1);
+
     CassandraConfig config =
         CassandraConfig.newBuilder()
             .setBootstrapHosts(LocalCassandra.getHost())
             .setPort(LocalCassandra.getPort())
             .setKeyspace("test")
             .setTableName("test_data_store")
-            .putAllReplicationOptions(
-                new HashMap<String, String>() {
-                  {
-                    put("class", "NetworkTopologyStrategy");
-                    put("dc1", "2");
-                    put("dc2", "3");
-                  }
-                })
+            .setReplicationOptions(replication)
             .build();
     TestUtil.setupCassandra(config);
   }
@@ -146,19 +144,18 @@ public class CassandraStoreUtilIT {
             .addColumn(CassandraMutation.VALUE, DataType.blob());
     LocalCassandra.getSession().execute(createTable);
 
+    Builder replication =
+        CassandraReplicationOptions.newBuilder()
+            .setClass_("SimpleStrategy")
+            .setReplicationFactor(1);
+
     CassandraConfig config =
         CassandraConfig.newBuilder()
             .setBootstrapHosts(LocalCassandra.getHost())
             .setPort(LocalCassandra.getPort())
             .setKeyspace("test")
             .setTableName("feature_store")
-            .putAllReplicationOptions(
-                new HashMap<String, String>() {
-                  {
-                    put("class", "SimpleStrategy");
-                    put("replication_factor", "2");
-                  }
-                })
+            .setReplicationOptions(replication)
             .build();
 
     TestUtil.setupCassandra(config);

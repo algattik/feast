@@ -1,0 +1,19 @@
+feast:
+  core-host: core
+
+  # List of store configurations
+  stores:
+    - name: online
+      type: CASSANDRA
+      config:
+        bootstrap_hosts: cassandra
+        port: 9042
+        keyspace: feast
+        table_name: feature_store
+        replication_options:
+          class: SimpleStrategy
+          replication_factor: 1
+      subscriptions:
+        # Wildcards match all options. No filtering is done.
+        - name: "*"
+          project: "*"

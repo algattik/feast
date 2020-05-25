@@ -24,6 +24,8 @@ import com.datastax.driver.core.Row;
 import com.google.protobuf.InvalidProtocolBufferException;
 import feast.proto.core.FeatureSetProto.FeatureSetSpec;
 import feast.proto.core.StoreProto.Store.CassandraConfig;
+import feast.proto.core.StoreProto.Store.CassandraReplicationOptions;
+import feast.proto.core.StoreProto.Store.CassandraReplicationOptions.Builder;
 import feast.proto.types.FeatureRowProto.FeatureRow;
 import feast.proto.types.FieldProto.Field;
 import feast.proto.types.ValueProto.Value;
@@ -53,18 +55,16 @@ public class CassandraFeatureSinkIT implements Serializable {
   private FeatureRow row;
 
   private static CassandraConfig getCassandraConfig() {
+    Builder replication =
+        CassandraReplicationOptions.newBuilder()
+            .setClass_("SimpleStrategy")
+            .setReplicationFactor(1);
     return CassandraConfig.newBuilder()
         .setBootstrapHosts(LocalCassandra.getHost())
         .setPort(LocalCassandra.getPort())
         .setTableName("feature_store")
         .setKeyspace("test")
-        .putAllReplicationOptions(
-            new HashMap<String, String>() {
-              {
-                put("class", "SimpleStrategy");
-                put("replication_factor", "1");
-              }
-            })
+        .setReplicationOptions(replication.build())
         .build();
   }
 
