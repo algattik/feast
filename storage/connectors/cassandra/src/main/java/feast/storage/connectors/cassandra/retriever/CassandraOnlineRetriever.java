@@ -112,16 +112,6 @@ public class CassandraOnlineRetriever implements OnlineRetriever {
 
     Session session = cluster.connect();
 
-    String init = config.get("init_script");
-    if (!StringUtils.isBlank(init)) {
-      for (String chunk : init.split(";")) {
-        if (!StringUtils.isBlank(chunk)) {
-          log.info("Executing init script chunk");
-          session.execute(chunk);
-        }
-      }
-    }
-
     return new CassandraOnlineRetriever(session, cassandraConfig, tracer, requestLatency);
   }
 

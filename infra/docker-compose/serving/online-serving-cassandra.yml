@@ -10,9 +10,10 @@ feast:
         port: 9042
         keyspace: feast
         table_name: feature_store
-        replication_options:
-          class: SimpleStrategy
-          replication_factor: 1
+        read_consistency_level: ONE
+        replication_strategy_class: SimpleStrategy
+        replication_strategy_replication_factor: 1
+
       subscriptions:
         # Wildcards match all options. No filtering is done.
         - name: "*"

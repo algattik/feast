@@ -160,15 +160,12 @@ message Store {
     // Specify 0 for no default expiration
     google.protobuf.Duration default_ttl = 5;
 
-    // Database initialization script, run every time a new connection is initiated. Should be idempotent.
-    string init_script = 6;
-
-    CassandraConsistencyLevel read_consistency_level = 7;
+    CassandraConsistencyLevel read_consistency_level = 6;
 
     // This specifies the replication strategy to use. Please refer to docs for more details:
     // https://docs.datastax.com/en/dse/6.7/cql/cql/cql_reference/cql_commands/cqlCreateKeyspace.html#cqlCreateKeyspace__cqlCreateKeyspacereplicationmap-Pr3yUQ7t
-    string replication_strategy_class = 8;
-    int32 replication_strategy_replication_factor = 9;
+    string replication_strategy_class = 7;
+    int32 replication_strategy_replication_factor = 8;
   }
 
   message RedisClusterConfig {

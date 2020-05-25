@@ -1,0 +1,7 @@
+version: '3.7'
+  
+services:
+  cassandra:
+    image: cassandra:3.11
+    ports:
+    - '7000:7000'
