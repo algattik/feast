@@ -133,24 +133,42 @@ message Store {
     int32 total_timeout_seconds = 5;
   }
 
+  enum CassandraConsistencyLevel {
+    ONE = 0;// default
+    ANY = 1;
+    TWO = 2;
+    THREE = 3;
+    QUORUM = 4;
+    ALL = 5;
+    LOCAL_QUORUM = 6;
+    EACH_QUORUM = 7;
+    SERIAL = 8;
+    LOCAL_SERIAL = 9;
+    LOCAL_ONE = 10;
+  }
+
   message CassandraConfig {
     // - bootstrapHosts: [comma delimited value of hosts]
     string bootstrap_hosts = 1;
     int32 port = 2;
     string keyspace = 3;
 
-    // Please note that table name must be "feature_store" as is specified in the @Table annotation of the
-    // datastax object mapper
+    // Feature store table name
     string table_name = 4;
 
     // Default expiration in seconds to use when FeatureSetSpec does not have max_age defined.
     // Specify 0 for no default expiration
     google.protobuf.Duration default_ttl = 5;
 
+    // Database initialization script, run every time a new connection is initiated. Should be idempotent.
+    string init_script = 6;
+
+    CassandraConsistencyLevel read_consistency_level = 7;
+
     // This specifies the replication strategy to use. Please refer to docs for more details:
     // https://docs.datastax.com/en/dse/6.7/cql/cql/cql_reference/cql_commands/cqlCreateKeyspace.html#cqlCreateKeyspace__cqlCreateKeyspacereplicationmap-Pr3yUQ7t
-    string replication_strategy_class = 6;
-    int32 replication_strategy_replication_factor = 7;
+    string replication_strategy_class = 8;
+    int32 replication_strategy_replication_factor = 9;
   }
 
   message RedisClusterConfig {

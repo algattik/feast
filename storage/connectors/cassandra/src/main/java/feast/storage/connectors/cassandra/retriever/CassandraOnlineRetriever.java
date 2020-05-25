@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 public class CassandraOnlineRetriever implements OnlineRetriever {
@@ -62,13 +63,19 @@ public class CassandraOnlineRetriever implements OnlineRetriever {
   private final Tracer tracer;
   private final PreparedStatement query;
   private final Histogram requestLatency;
+  private final ConsistencyLevel readConsistencyLevel;
 
   public CassandraOnlineRetriever(
-      Session session, String keyspace, String tableName, Tracer tracer, Histogram requestLatency) {
+      Session session, CassandraConfig config, Tracer tracer, Histogram requestLatency) {
     super();
+    if (StringUtils.isBlank(config.getKeyspace()))
+      throw new IllegalArgumentException("Config keyspace setting is null or empty");
+    if (StringUtils.isBlank(config.getTableName()))
+      throw new IllegalArgumentException("Config tableName setting is null or empty");
     this.session = session;
-    this.keyspace = keyspace;
-    this.tableName = tableName;
+    this.keyspace = config.getKeyspace();
+    this.tableName = config.getTableName();
+    this.readConsistencyLevel = ConsistencyLevel.valueOf(config.getReadConsistencyLevel().name());
     this.tracer = tracer;
     this.query =
         session.prepare(
@@ -82,9 +89,10 @@ public class CassandraOnlineRetriever implements OnlineRetriever {
       Map<String, String> config, Tracer tracer, Histogram requestLatency) {
     CassandraConfig cassandraConfig =
         CassandraConfig.newBuilder()
-            .setBootstrapHosts(config.get("host"))
+            .setBootstrapHosts(config.get("bootstrap_hosts"))
             .setPort(Integer.parseInt(config.get("port")))
             .setKeyspace(config.get("keyspace"))
+            .setTableName(config.get("table_name"))
             .build();
 
     List<InetSocketAddress> contactPoints =
@@ -104,12 +112,17 @@ public class CassandraOnlineRetriever implements OnlineRetriever {
 
     Session session = cluster.connect();
 
-    return new CassandraOnlineRetriever(
-        session,
-        cassandraConfig.getKeyspace(),
-        cassandraConfig.getTableName(),
-        tracer,
-        requestLatency);
+    String init = config.get("init_script");
+    if (!StringUtils.isBlank(init)) {
+      for (String chunk : init.split(";")) {
+        if (!StringUtils.isBlank(chunk)) {
+          log.info("Executing init script chunk");
+          session.execute(chunk);
+        }
+      }
+    }
+
+    return new CassandraOnlineRetriever(session, cassandraConfig, tracer, requestLatency);
   }
 
   @Override
@@ -124,7 +137,7 @@ public class CassandraOnlineRetriever implements OnlineRetriever {
               .map(EntitySpec::getName)
               .collect(Collectors.toList());
 
-      log.info("Computiing cassandra keys from {} with rows {}", featureSetEntityNames, entityRows);
+      log.info("Computing cassandra keys from {} with rows {}", featureSetEntityNames, entityRows);
       List<String> cassandraKeys =
           createLookupKeys(featureSetEntityNames, entityRows, featureSetRequest);
       try {
@@ -160,7 +173,6 @@ public class CassandraOnlineRetriever implements OnlineRetriever {
    */
   protected List<FeatureRow> getAndProcessAll(
       List<String> keys, List<EntityRow> entityRows, FeatureSetRequest featureSetRequest) {
-    FeatureSetSpec spec = featureSetRequest.getSpec();
     log.debug("Sending multi get: {}", keys);
     List<ResultSet> results = sendMultiGet(keys);
     long startTime = System.currentTimeMillis();
@@ -180,7 +192,6 @@ public class CassandraOnlineRetriever implements OnlineRetriever {
     try (Scope scope = tracer.buildSpan("Cassandra-processResponse").startActive(true)) {
       List<FeatureRow> response = new ArrayList<FeatureRow>();
       for (int i = 0; i < results.size(); i++) {
-        EntityRow entityRow = entityRows.get(i);
         ResultSet queryRows = results.get(i);
         Instant instant = Instant.now();
         List<Field> fields = new ArrayList<>();
@@ -191,7 +202,7 @@ public class CassandraOnlineRetriever implements OnlineRetriever {
                 "The row in question doesn't have a write time column {}",
                 row.getColumnDefinitions());
             log.info("Bad row query returned: {}", row);
-            log.info("Entities {}, Key {}", entityRow, keys.get(i));
+            log.info("Entities {}, Key {}", row, keys.get(i));
             continue;
           }
           long microSeconds = row.getLong("writetime");
@@ -261,7 +272,7 @@ public class CassandraOnlineRetriever implements OnlineRetriever {
         for (String key : keys) {
           results.add(
               session.execute(
-                  query.bind(key).enableTracing().setConsistencyLevel(ConsistencyLevel.TWO)));
+                  query.bind(key).enableTracing().setConsistencyLevel(readConsistencyLevel)));
         }
         return results;
       } catch (Exception e) {

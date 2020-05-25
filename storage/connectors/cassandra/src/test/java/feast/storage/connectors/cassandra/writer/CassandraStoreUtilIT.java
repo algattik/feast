@@ -54,7 +54,7 @@ public class CassandraStoreUtilIT {
             .setKeyspace("test")
             .setTableName("feature_store")
             .setReplicationStrategyClass("SimpleStrategy")
-            .setReplicationStrategyReplicationFactor(1)
+            .setReplicationStrategyReplicationFactor(3)
             .build();
     TestUtil.setupCassandra(config);
 
